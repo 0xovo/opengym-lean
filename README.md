@@ -49,9 +49,13 @@ on your phone, synced across your devices, behind your own passkey login.
 
 **Two ways to use it**
 
-- **Option 1: Local only (zero setup).** Deploy the static app on any static host,
-  or run it locally, and just use it. Everything runs in your browser, your data
-  stays in your browser, no account and nothing to configure. Build steps are under
+- **Option 1: Just open it (static website).** Open the live site,
+  [swift-jade-u85p9hm.tmp.now](https://swift-jade-u85p9hm.tmp.now), then add it to
+  your home screen: on iPhone tap Share, then Add to Home Screen; on Android tap
+  Install app in the browser menu. That is it. It is a static website, everything
+  runs in your browser, your data stays in your browser, no account and nothing
+  to set up.
+  Want your own copy of the static site instead? The build steps are under
   "Run this fork" further down.
 - **Option 2: Sync across your devices (your own Firestore + Vercel).** Sign in
   with a passkey, and your plan and history live in your own free Firebase project,
