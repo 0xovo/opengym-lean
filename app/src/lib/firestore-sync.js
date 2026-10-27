@@ -91,7 +91,7 @@ async function signInWithToken(token) {
 }
 
 /** Create the account and its first passkey. Bootstrap rule: allowed only while the
- *  username has no credentials yet (see SETUP-FIREBASE.md, single-user trust model). */
+ *  username has no credentials yet (see SETUP-SYNC.md, single-user trust model). */
 export async function fbRegister(username) {
   await ensureFirebase()
   const name = (username || '').trim()

@@ -47,6 +47,19 @@ on your phone, synced across your devices, behind your own passkey login.
 > box, your data stays in your browser. If you want sync across devices, you can link
 > your own Firestore with a Vercel deploy (see [SETUP-SYNC.md](SETUP-SYNC.md)).
 
+**Two ways to use it**
+
+- **Option 1: Local only (zero setup).** Deploy the static app on any static host,
+  or run it locally, and just use it. Everything runs in your browser, your data
+  stays in your browser, no account and nothing to configure. Build steps are under
+  "Run this fork" further down.
+- **Option 2: Sync across your devices (your own Firestore + Vercel).** Sign in
+  with a passkey, and your plan and history live in your own free Firebase project,
+  synced live between your phone and laptop. One guided page walks you through it,
+  [SETUP-SYNC.md](SETUP-SYNC.md), and this button does the Vercel half:
+
+  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F0xovo%2Fopengym-lean&project-name=opengym-lean&repository-name=opengym-lean&root-directory=sync-server&env=FIREBASE_SERVICE_ACCOUNT%2CWEBAUTHN_RP_ID%2CWEBAUTHN_ORIGIN%2CVITE_FB_API_KEY%2CVITE_FB_PROJECT_ID%2CVITE_FB_APP_ID&envDescription=All+values+come+from+your+own+Firebase+project+%28SETUP-SYNC.md%2C+Part+1%29.+FIREBASE_SERVICE_ACCOUNT+is+the+service+account+JSON+pasted+as+one+value.+WEBAUTHN_RP_ID+is+your+Vercel+domain+as+a+bare+host+%28your-project.vercel.app%29+and+WEBAUTHN_ORIGIN+is+the+same+domain+with+https%3A%2F%2F+in+front.+VITE_FB_API_KEY%2C+VITE_FB_PROJECT_ID+and+VITE_FB_APP_ID+come+from+the+firebaseConfig+block+of+your+web+app.&envLink=https%3A%2F%2Fgithub.com%2F0xovo%2Fopengym-lean%2Fblob%2Fmain%2FSETUP-SYNC.md)
+
 **What was removed vs upstream**
 
 - **Gym check-in card**: the CheckIn screen (including the membership QR), the
