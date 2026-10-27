@@ -1,0 +1,43 @@
+{
+  "name": "opengym-frontend",
+  "private": true,
+  "version": "1.4.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:mobile": "VITE_MOBILE=1 vite build && node ../scripts/catalogue/stage-media.mjs dist && cap sync && node scripts/check-mobile-bundle.mjs",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:fatigue-probe": "node scripts/fatigue-monotonic-probe.mjs"
+  },
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "@aparajita/capacitor-secure-storage": "^7.1.6",
+    "@capacitor-mlkit/barcode-scanning": "^7.5.0",
+    "@capacitor/app": "^7.1.2",
+    "@capacitor/core": "^7.6.8",
+    "@capacitor/filesystem": "^7.1.8",
+    "@capacitor/local-notifications": "^7.0.7",
+    "@capacitor/share": "^7.0.4",
+    "jsqr": "^1.4.0",
+    "lean-qr": "^2.7.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.2",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^7.6.8",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.6.8",
+    "@capacitor/ios": "^7.6.8",
+    "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "^4.1.11",
+    "happy-dom": "^20.11.2",
+    "linkedom": "^0.18.13",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
+  }
+}
