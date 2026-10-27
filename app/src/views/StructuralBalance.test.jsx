@@ -217,22 +217,19 @@ describe('the way in from Stats', () => {
   })
 })
 
-// The demo build (VITE_DEMO=1) boots a guest on the seeded example profile and has no server:
-// every template has to render against that profile, and score what it logs.
+// The demo build (VITE_DEMO=1) boots a guest on the empty starter profile and has no server:
+// every template has to render against that profile, with nothing scored yet.
 describe('on the demo profile', () => {
-  it('renders every template and scores the lifts the example history has', () => {
+  it('renders every template with every lift still at no-data', () => {
     useStore.setState({ S: Object.assign(clone(DEF), buildDemoState()), user: null })
     const host = render()
-    const scored = {}
     for (const tpl of TEMPLATE_LIST) {
       const button = [...host.querySelectorAll('.seg button')].find(b => b.textContent === tpl.label)
       act(() => button.click())
       const rows = [...host.querySelectorAll('[data-role-id]')]
       expect(rows.map(r => r.dataset.roleId)).toEqual(tpl.roles.map(r => r.id))
-      scored[tpl.id] = rows.filter(r => r.dataset.status !== 'no-data').map(r => r.dataset.roleId)
+      expect(rows.every(r => r.dataset.status === 'no-data')).toBe(true)
     }
-    expect(scored.thibaudeauPowerlifting).toEqual(expect.arrayContaining(['squat', 'bench']))
-    expect(scored.atg).toEqual(expect.arrayContaining(['romanianDeadlift', 'atgDips']))
     expect(host.textContent).not.toContain('NaN')
     expect(host.textContent).not.toContain('undefined')
   })

@@ -12,7 +12,7 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({ MOBILE: false, coachLocal: null }))
-vi.mock('./demo.js', () => ({ DEMO: false, DEMO_SEEDED: 'gym_demo_seeded_v1', REPO: '' }))
+vi.mock('./demo.js', () => ({ DEMO: false, DEMO_SEEDED: 'gym_demo_seeded_v2', REPO: '' }))
 vi.mock('./mobile.js', () => ({ get MOBILE() { return mocks.MOBILE } }))
 vi.mock('./api.js', () => ({ api: vi.fn() }))
 vi.mock('../store/useStore.js', () => ({ useStore: { getState: () => ({ S: {}, coachLocal: mocks.coachLocal }) } }))
