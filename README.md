@@ -45,7 +45,7 @@ on your phone, synced across your devices, behind your own passkey login.
 
 > I liked openGym, so I made a leaner, plug-and-play version. Use it locally out of the
 > box — your data stays in your browser. If you want sync across devices, you can link
-> your own Firestore with a Vercel deploy *(sync mode in progress)*.
+> your own Firestore with a Vercel deploy (see [SETUP-SYNC.md](SETUP-SYNC.md)).
 
 **What was removed vs upstream**
 

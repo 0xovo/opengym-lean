@@ -1,0 +1,1 @@
+{"dependencies":{"@simplewebauthn/server":"^13.0.0","firebase-admin":"^13.0.0"},"description":"Vercel deploy root for the optional sync mode: the static PWA (public/, copied from ../app/dist) plus the /api/passkey/* serverless functions. See ../SETUP-SYNC.md.","name":"opengym-lean-sync-server","private":true,"type":"module","version":"1.0.0"}
