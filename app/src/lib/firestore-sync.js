@@ -1,5 +1,5 @@
 // Firestore sync + passkey sign-in (Phase 2). Loaded ONLY dynamically, and only when
-// lib/firebase-config.js says Firebase mode is on with a full config — the Firebase SDK
+// lib/firebase-config.js says Firebase mode is on with a full config, the Firebase SDK
 // never enters a demo/local build's runtime path.
 //
 // How sync works
@@ -10,8 +10,8 @@
 //   sign-in → read users/{uid} (meta doc + the five subcollections, see firestore-model.js)
 //           → if the account is empty, upload this device's current state as the initial
 //             cloud state (that's how the seeded profile becomes the cloud profile)
-//           → otherwise mergeStates(cloud, local) — upstream's own merge, tombstones and
-//             per-field stamps included — hydrate the store with the result, and push the
+//           → otherwise mergeStates(cloud, local), upstream's own merge, tombstones and
+//             per-field stamps included, hydrate the store with the result, and push the
 //             merged copy back so the cloud converges on it
 //   live    → onSnapshot on the meta doc + each subcollection: a change from another
 //             device is merged in the same way and hydrated, unless it is just the echo of
@@ -91,7 +91,7 @@ async function signInWithToken(token) {
 }
 
 /** Create the account and its first passkey. Bootstrap rule: allowed only while the
- *  username has no credentials yet (see SETUP-FIREBASE.md — single-user trust model). */
+ *  username has no credentials yet (see SETUP-FIREBASE.md, single-user trust model). */
 export async function fbRegister(username) {
   await ensureFirebase()
   const name = (username || '').trim()
@@ -173,7 +173,7 @@ async function attach(useStore, uid) {
 
   const sess = session = {
     uid, unsubs: [], pushTm: null, storeOff: null,
-    ready: false, // initial load done — pushes/listeners only count from here
+    ready: false, // initial load done, pushes/listeners only count from here
     known: null, // splitHashes of what the cloud is believed to hold right now
     remote: null, // latest assembled cloud state (joinDocs form), for echo checks
   }

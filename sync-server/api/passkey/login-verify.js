@@ -7,7 +7,7 @@ export default handler(async (req, res) => {
   if (!response?.id) return send(res, 400, { error: 'Missing passkey response' })
   const { auth, db } = admin()
   const ch = await takeChallenge(db, challengeId, 'auth')
-  if (!ch) return send(res, 400, { error: 'That sign-in expired — try again' })
+  if (!ch) return send(res, 400, { error: 'That sign-in expired. Try again' })
 
   const credRef = db.collection('passkeys').doc(String(response.id))
   const credSnap = await credRef.get()

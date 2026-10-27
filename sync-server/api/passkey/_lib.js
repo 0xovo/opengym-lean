@@ -1,15 +1,15 @@
 // Shared plumbing for the /api/passkey/* Vercel functions.
 //
 // Why these exist: Firebase Auth has no passkey sign-in, and Firestore alone cannot run a
-// WebAuthn ceremony — something server-side must issue challenges, verify responses and,
+// WebAuthn ceremony: something server-side must issue challenges, verify responses and,
 // on success, mint the Firebase custom token the browser signs in with. That something is
 // these four small functions (@simplewebauthn/server + firebase-admin), NOT Cloud
 // Functions, so the Firebase project stays on the free Spark plan (no Blaze billing).
 //
 // Credentials come only from the FIREBASE_SERVICE_ACCOUNT env var (the service-account
-// JSON, as one string) set in the Vercel project — never from a file, never committed.
+// JSON, as one string) set in the Vercel project, never from a file, never committed.
 //
-// Data (Firestore, Admin SDK only — firestore.rules denies clients all access):
+// Data (Firestore, Admin SDK only: firestore.rules denies clients all access):
 //   passkeyUsers/{username}     { uid, userHandle, createdAt }
 //   passkeys/{credentialId}     { uid, username, publicKey, counter, transports, … }
 //   passkeyChallenges/{id}      { kind, challenge, username, userHandle, expiresAt }

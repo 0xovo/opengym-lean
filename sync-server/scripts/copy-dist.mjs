@@ -9,7 +9,7 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 const src = join(root, '..', 'app', 'dist')
 const dst = join(root, 'public')
 if (!existsSync(join(src, 'index.html'))) {
-  console.error(`No build at ${src} — build the app first (see ../SETUP-SYNC.md)`)
+  console.error(`No build at ${src}. Build the app first (see ../SETUP-SYNC.md)`)
   process.exit(1)
 }
 rmSync(dst, { recursive: true, force: true })

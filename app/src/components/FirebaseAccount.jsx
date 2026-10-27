@@ -5,7 +5,7 @@ import { bio } from '../lib/api.js'
 import { Button } from './ui.jsx'
 
 // Firebase mode (Phase 2): passkey sign-in + Firestore sync controls. The sync engine and
-// the Firebase SDK live in lib/firestore-sync.js and are imported lazily — these components
+// the Firebase SDK live in lib/firestore-sync.js and are imported lazily, these components
 // render nothing until it loads, and they only mount when lib/firebase-config says Firebase
 // mode is on, so a local/demo build is untouched by them.
 
@@ -20,7 +20,7 @@ function useFb() {
   return { mod, auth }
 }
 
-/** The sign-in / create-account form. `onSignedIn` fires after a successful ceremony —
+/** The sign-in / create-account form. `onSignedIn` fires after a successful ceremony,
  *  the Login screen uses it to step into the app (the store stays in local/guest mode;
  *  Firebase Auth is what carries the session, and the sync engine keys off it). */
 export function FirebaseSignIn({ onSignedIn } = {}) {
@@ -40,7 +40,7 @@ export function FirebaseSignIn({ onSignedIn } = {}) {
   )
   return <>
     <div className="muted small" style={{ marginBottom: 12 }}>
-      {t('Sign in with {0} — no password. First time here, create the account with your first passkey.', bio())}
+      {t('Sign in with {0}, no password. First time here, create the account with your first passkey.', bio())}
     </div>
     <input className="input" placeholder={t('Username')} maxLength={40} value={name}
       onChange={e => setName(e.target.value)} autoComplete="username" />

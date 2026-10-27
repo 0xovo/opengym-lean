@@ -1,8 +1,8 @@
-// Firebase mode (Phase 2) — cross-device sync through Firestore + passkey sign-in.
+// Firebase mode (Phase 2): cross-device sync through Firestore + passkey sign-in.
 //
 // The gate is a build-time env pair: VITE_FIREBASE=1 turns the mode on, and the VITE_FB_*
 // values say which Firebase project to talk to. With either missing the app behaves exactly
-// as the local demo build always has — nothing in this file (or in firestore-sync.js, which
+// as the local demo build always has, nothing in this file (or in firestore-sync.js, which
 // is only ever imported dynamically when `firebaseEnabled`) reaches the Firebase SDK.
 //
 // The web config values are not secrets: they identify the project, and Firestore security

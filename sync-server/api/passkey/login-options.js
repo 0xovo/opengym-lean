@@ -12,7 +12,7 @@ export default handler(async (req, res) => {
   let allowCredentials = []
   if (name) {
     const creds = await credsOf(db, name)
-    if (!creds.length) return send(res, 404, { error: 'No passkey for that username yet — create the account first' })
+    if (!creds.length) return send(res, 404, { error: 'No passkey for that username yet, create the account first' })
     allowCredentials = creds.map(c => ({ id: c.id, transports: c.transports || [] }))
   }
   const options = await generateAuthenticationOptions({ rpID: RP_ID, allowCredentials, userVerification: 'preferred' })

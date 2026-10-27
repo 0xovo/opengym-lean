@@ -26,7 +26,7 @@ export const FB_LISTS = [
 const LIST_FIELDS = new Set(FB_LISTS.map(l => l.field))
 
 // Firestore document ids: any UTF-8 except '/', never '.'/'..' or '__…__'. Item keys are
-// app-generated ids or dates, plus the workout fallback `${d}|${start}` — percent-encoding
+// app-generated ids or dates, plus the workout fallback `${d}|${start}`, percent-encoding
 // covers every case uniformly and decodes back to the exact key.
 export const docIdFor = key => encodeURIComponent(String(key))
 export const keyForDocId = id => { try { return decodeURIComponent(id) } catch { return id } }
@@ -36,7 +36,7 @@ export const keyForDocId = id => { try { return decodeURIComponent(id) } catch {
 // undefined leaves and detaches the copy from the live store object.
 export const sanitize = v => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)))
 
-// FNV-1a, the same hash lib/sync-changes.js fingerprints entries with — here per entry, so
+// FNV-1a, the same hash lib/sync-changes.js fingerprints entries with, here per entry, so
 // the sync layer can tell exactly which docs a change touched.
 export function entryHash(v) {
   const s = JSON.stringify(v) ?? ''

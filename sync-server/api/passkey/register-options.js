@@ -5,10 +5,10 @@ import { admin, body, send, handler, validUsername, credsOf, bearerUid, saveChal
 // POST { username } → { options, challengeId }
 //
 // Bootstrap rule (single-user trust model, see SETUP-SYNC.md): a username with NO
-// credentials yet may register its first passkey with no other proof — whoever registers
+// credentials yet may register its first passkey with no other proof, whoever registers
 // first owns the name. Once credentials exist, registering another passkey for the name
 // requires a Firebase ID token for that same account (i.e. being signed in on a device
-// that already has one — Settings → "Add a passkey on this device").
+// that already has one, Settings → "Add a passkey on this device").
 export default handler(async (req, res) => {
   const { username } = await body(req)
   const name = typeof username === 'string' ? username.trim() : ''

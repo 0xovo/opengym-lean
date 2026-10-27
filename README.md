@@ -44,14 +44,14 @@ on your phone, synced across your devices, behind your own passkey login.
 ## About this fork (opengym-lean)
 
 > I liked openGym, so I made a leaner, plug-and-play version. Use it locally out of the
-> box — your data stays in your browser. If you want sync across devices, you can link
+> box, your data stays in your browser. If you want sync across devices, you can link
 > your own Firestore with a Vercel deploy (see [SETUP-SYNC.md](SETUP-SYNC.md)).
 
 **What was removed vs upstream**
 
-- **Gym check-in card** — the CheckIn screen (including the membership QR), the
-  “At the gym” card on Home, and the check-in settings switch are gone.
-- **AI Coach** — all the coach screens, the Coach button on the Plan page, and the
+- **Gym check-in card**: the CheckIn screen (including the membership QR), the
+  "At the gym" card on Home, and the check-in settings switch are gone.
+- **AI Coach**: all the coach screens, the Coach button on the Plan page, and the
   coach settings are gone. (Coach code stays in the data layer, but nothing in the
   UI can reach it.)
 
@@ -60,7 +60,7 @@ on your phone, synced across your devices, behind your own passkey login.
 Everything else: workout logging, weekly plans and routines, stats, history, the
 exercise library, measurements and bodyweight, progress photos, the rest timer, and
 backup export/import. Still local-first, still AGPL-3.0, and full credit to
-[DuarteSantos/openGym](https://github.com/DuarteSantos8/openGym) — see
+[DuarteSantos/openGym](https://github.com/DuarteSantos8/openGym), see
 [NOTICE.md](NOTICE.md).
 
 ## Why openGym
@@ -217,7 +217,7 @@ npm ci
 VITE_DEMO=1 npm run build   # static build → app/dist/
 ```
 
-Serve `app/dist/` with any static host — on Vercel, import the repository, set the
+Serve `app/dist/` with any static host: on Vercel, import the repository, set the
 root directory to `app`, build command `VITE_DEMO=1 npm run build`, output directory
 `dist`. The demo build boots in guest mode with example data, stored in your
 browser's local storage; move it between devices with Settings → Data & backup

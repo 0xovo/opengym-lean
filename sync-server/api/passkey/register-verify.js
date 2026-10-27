@@ -10,7 +10,7 @@ export default handler(async (req, res) => {
   if (!name || !response) return send(res, 400, { error: 'Missing username or passkey response' })
   const { auth, db } = admin()
   const ch = await takeChallenge(db, challengeId, 'reg')
-  if (!ch || ch.username !== name) return send(res, 400, { error: 'That registration expired — try again' })
+  if (!ch || ch.username !== name) return send(res, 400, { error: 'That registration expired. Try again' })
 
   const mapRef = db.collection('passkeyUsers').doc(name)
   const mapSnap = await mapRef.get()
