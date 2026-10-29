@@ -1,6 +1,29 @@
 // Web Push subscribe/unsubscribe — requires a signed-in profile (subscriptions are stored
 // server-side per user, same as everything else under /api).
 import { api } from './api.js'
+import { firebaseEnabled } from './firebase-config.js'
+
+// Firebase build: /api/push/* are this project's own Vercel functions and they
+// take the Firebase ID token, not the upstream session api() rides on. The
+// token getter lives in firestore-sync.js and is imported lazily, so the
+// Firebase SDK stays out of the main bundle, as everywhere else in the add-on.
+// Server mode never takes this branch: every call below behaves as before.
+async function fbApi(path, { method = 'GET', body: b } = {}) {
+  const { fbIdToken } = await import('./firestore-sync.js')
+  const token = await fbIdToken()
+  const r = await fetch(path, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    ...(b !== undefined ? { body: JSON.stringify(b) } : {}),
+  })
+  const data = await r.json().catch(() => ({}))
+  if (!r.ok) { const e = new Error(data.error || 'Request failed (' + r.status + ')'); e.status = r.status; throw e }
+  return data
+}
+const pushGet = path => firebaseEnabled ? fbApi(path) : api(path)
+const pushPost = (path, obj) => firebaseEnabled
+  ? fbApi(path, { method: 'POST', body: obj })
+  : api(path, { method: 'POST', body: JSON.stringify(obj) })
 
 // main.jsx registers the service worker on https only, so on any other origin there is no
 // worker and `navigator.serviceWorker.ready` never settles — the toggle looked usable and hung.
@@ -55,14 +78,14 @@ const readyWorker = (ms = 8000) => Promise.race([
   new Promise((_, reject) => setTimeout(() => reject(new Error('Service worker not ready')), ms))
 ])
 
-const register = sub => api('/api/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription: sub.toJSON(), deviceId: deviceId() }) })
+const register = sub => pushPost('/api/push/subscribe', { subscription: sub.toJSON(), deviceId: deviceId() })
 
 export async function enablePush() {
   if (!pushSupported()) throw new Error('Push notifications are not supported in this browser')
   const perm = await Notification.requestPermission()
   if (perm !== 'granted') throw new Error('Notifications permission was not granted')
   const reg = await readyWorker()
-  const { key } = await api('/api/push/public-key')
+  const { key } = await pushGet('/api/push/public-key')
   const subscription = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(key) })
   await shareDeviceId()
   await register(subscription)
@@ -74,7 +97,7 @@ export async function disablePush() {
   const sub = await reg.pushManager.getSubscription()
   if (!sub) return
   await sub.unsubscribe()
-  await api('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => {})
+  await pushPost('/api/push/unsubscribe', { endpoint: sub.endpoint }).catch(() => {})
 }
 
 /* Brings the server's copy of this browser's subscription back in line with the browser's.
@@ -95,7 +118,7 @@ export async function syncPushSubscription() {
   let sub = await reg.pushManager.getSubscription()
   if (!sub) return false
   await shareDeviceId()
-  const { key } = await api('/api/push/public-key')
+  const { key } = await pushGet('/api/push/public-key')
   const mine = sub.options?.applicationServerKey
   if (mine && key && bytesToUrlBase64(mine) !== key.replace(/=+$/, '')) {
     await sub.unsubscribe().catch(() => {})
@@ -110,10 +133,31 @@ export async function syncPushSubscription() {
   // a rotated subscription with no id to hand, and the check used to stop at "subscribed". An api
   // from before this answer sends no deviceId at all (not null): it cannot say, and a re-send it
   // never reports back would be a db.json write on every boot.
-  const { subscribed, deviceId: storedAs } = await api('/api/push/status?endpoint=' + encodeURIComponent(sub.endpoint))
+  const { subscribed, deviceId: storedAs } = firebaseEnabled
+    ? await fbApi('/api/push/status', { method: 'POST', body: { endpoint: sub.endpoint } })
+    : await api('/api/push/status?endpoint=' + encodeURIComponent(sub.endpoint))
   const id = deviceId()
   if (!subscribed || (id && storedAs !== undefined && storedAs !== id)) await register(sub)
   return true
 }
 
 export const sendTestPush = () => api('/api/push/test', { method: 'POST', body: '{}' })
+
+/* Books (or cancels) the rest-timer push with this project's own functions,
+   Firebase build only. Upstream's booking lives in store/useUI.js behind a
+   signed-in server user, a state this build never reaches, so the Firebase
+   branch books through here instead. The booking is a restJobs row plus a
+   delayed QStash message (when the deployer configured QStash, see
+   SETUP-SYNC.md); at the end QStash calls /api/push/send, which pushes to
+   the subscription enablePush stored under this browser's device id.
+   Fire-and-forget by contract: callers catch, and a failed booking must
+   never touch the timer. */
+export function fbBookRestTimer(seconds) {
+  if (!firebaseEnabled) return Promise.resolve()
+  return fbApi('/api/push/rest-timer', { method: 'POST', body: { seconds, deviceId: deviceId() } })
+}
+
+export function fbCancelRestTimer() {
+  if (!firebaseEnabled) return Promise.resolve()
+  return fbApi('/api/push/rest-timer/cancel', { method: 'POST', body: { deviceId: deviceId() } })
+}

@@ -86,7 +86,10 @@ Rest timer alerts work with no server here. Upstream announces a finished rest
 with a push sent by its server; with no server to book the end with, this fork
 announces it locally instead (Settings, then Notifications): a system
 notification when a rest ends while the app is open or still alive, and a
-catch-up alert when you come back to the app after the end has passed.
+catch-up alert when you come back to the app after the end has passed. Sync
+mode can go one step further: with a free QStash account the end is also
+booked for a real push that fires with the phone locked (the QStash section
+of [SETUP-SYNC.md](SETUP-SYNC.md)).
 
 ## Why openGym
 

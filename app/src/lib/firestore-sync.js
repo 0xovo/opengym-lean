@@ -135,6 +135,15 @@ export async function fbSignOut() {
   await signOut(auth)
 }
 
+/** The signed-in user's Firebase ID token, or null when signed out. Lets the
+ *  push client (lib/push.js) authenticate against this project's own
+ *  /api/push/* functions with the same bearer credential the passkey ceremony
+ *  uses, without the SDK being imported anywhere new. */
+export async function fbIdToken() {
+  await ensureFirebase()
+  return auth.currentUser ? auth.currentUser.getIdToken() : null
+}
+
 // ---- sync engine
 export function startFirestoreSync(useStore) {
   if (started) return

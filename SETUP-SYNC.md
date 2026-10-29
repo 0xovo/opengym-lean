@@ -32,7 +32,11 @@ your first sign-in. Do them in order.
    three of them into Vercel in Part 2.
 3. **Turn on Firestore.** Left menu: Build, then Firestore Database, then "Create
    database". Choose **Start in production mode**, pick a location (you cannot
-   change it later, either offered region is fine), then Enable.
+   change it later, either offered region is fine), then Enable. Do not pick
+   test mode here: test mode looks like it works, but its rules stay open only
+   until a date about 30 days out, and after that date Firestore denies
+   everything and sync quietly stops. Production mode plus the rules you
+   publish in Part 3 is the setup that keeps working.
 4. **Turn on Authentication.** Left menu: Build, then Authentication, then "Get
    started". You do not need to enable any sign-in provider in the list: the app
    signs in with custom tokens minted by the passkey functions. Just visiting
@@ -128,6 +132,53 @@ tab, paste the contents of `firestore.rules`, Publish.
 - If sign-in fails with an origin or RP error, the two `WEBAUTHN_*` values do
   not match the domain in the address bar. Fix them in the Vercel project
   settings and redeploy.
+- If sign-in works but your data never shows on the second device, the usual
+  cause is the Firestore rules: either Part 3 was skipped, or the database
+  was created in test mode and its roughly 30 days ran out. The tell-tale
+  sign is in the browser developer tools console on the signed-in device: a
+  Firestore error reading "Missing or insufficient permissions". The fix is
+  to publish the rules from Part 3.
+
+## Optional: rest alerts with the phone locked (QStash)
+
+By default the rest timer announces itself locally: a notification when a
+rest ends while the app is open or still alive, and a catch-up alert when you
+come back to the app after the end has passed. What a web app cannot do on
+its own is fire at an exact moment once the phone has locked and the system
+has suspended it. For that, the end has to be booked with something that can
+wake up on schedule and send a real Web Push.
+
+That something is Upstash QStash, a free scheduling service. With it set up,
+starting a rest also books the end with QStash. At the end, QStash calls a
+function in your own Vercel project, and that function sends the push to the
+phone that started the rest. Pausing or skipping cancels the booking, and
+extending the rest re-books it. The free QStash tier, about 1,000 messages a
+day, is far more than a rest timer needs. And none of this is required:
+without it, everything works exactly as before, with the local alert.
+
+Setup, once Parts 1 to 4 are working:
+
+1. **Create a free Upstash account** at https://upstash.com, then open the
+   QStash console.
+2. **Generate a VAPID key pair** (the key pair that signs the pushes). In a
+   terminal: `npx web-push generate-vapid-keys`. It prints a public key and
+   a private key. Treat the private key like the service account: never in a
+   repo, never shared.
+3. **Add five environment variables** in your Vercel project (Settings,
+   Environment Variables, Production):
+   - `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY`, from step 2.
+   - `QSTASH_TOKEN`, the token shown in the QStash console.
+   - `QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY`, the two
+     signing keys shown in the QStash console. They are how your function
+     knows a call at the rest's end really came from QStash.
+4. **Redeploy** (Deployments tab, Redeploy) so the functions pick the values
+   up. The build log warns about any of the five that are missing, but the
+   build succeeds either way.
+5. **Subscribe the phone.** Open the app from your Home Screen icon (on iOS,
+   web push needs the installed app and iOS 16.4 or later), sign in, then
+   Settings, Notifications, and turn them on. That subscribes this phone.
+   Each device subscribes itself the same way, and a rest alerts the device
+   that started it.
 
 ## One honest warning about the trust model
 

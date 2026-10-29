@@ -23,7 +23,7 @@ import { wakeLockSupported } from '../lib/wakelock.js'
 import { t, tn, LANGS, INSTR_LANGS, EXERCISE_NAME_LANGS, baseLang, dateLocale } from '../lib/i18n.js'
 import { effectiveLang } from '../lib/default-lang.js'
 import { DEMO, REPO } from '../lib/demo.js'
-import { FIREBASE_MODE } from '../lib/firebase-config.js'
+import { FIREBASE_MODE, firebaseEnabled } from '../lib/firebase-config.js'
 import FirebaseAccount from '../components/FirebaseAccount.jsx'
 import { MOBILE, isAndroid, shareExport, shareExportBlob, syncReminder } from '../lib/mobile.js'
 import { NUDGE_COPY, NUDGE_TONES, toneOf } from '../lib/nudge.js'
@@ -1119,11 +1119,17 @@ function PushCard({ S, update, toast }) {
   const [on, setOn] = useState(false)
   const [busy, setBusy] = useState(false)
   const supported = pushSupported()
-  // No server session (local mode, the sync mode, a guest): no push server
-  // exists to hold a subscription, so the card runs on the local rest
-  // notifications (lib/rest-notify.js) and never touches the /api push path.
+  // No server session (local mode, a guest): no push server exists to hold a
+  // subscription, so the card runs on the local rest notifications
+  // (lib/rest-notify.js) and never touches the /api push path. The sync mode
+  // (Firebase build) is the fb branch: the same local layer, plus, when this
+  // browser can subscribe, a real Web Push booked with this project's own
+  // /api/push/* functions. The local layer stays as the fallback whenever
+  // the push half is unavailable (not installed, not signed in, the deployer
+  // never configured it, subscription refused).
   const user = useStore(s => s.user)
   const local = !user
+  const fb = firebaseEnabled
 
   // "On" means the server holds this browser's subscription, not merely that the browser has
   // one: a row the instance dropped (dead send, rebuilt db.json) left the switch on with nothing
@@ -1131,18 +1137,44 @@ function PushCard({ S, update, toast }) {
   // (offline), the browser's side is the best answer available.
   useEffect(() => {
     if (!supported) return
+    if (fb) {
+      setOn(restNotifyEnabled() && Notification.permission === 'granted')
+      // Re-register this browser's subscription with the push functions, the
+      // same self-healing the server path gets below: a rotated or lost
+      // subscription is back before the next rest is booked.
+      if (restNotifyEnabled()) syncPushSubscription().catch(() => {})
+      return
+    }
     if (local) { setOn(restNotifyEnabled() && Notification.permission === 'granted'); return }
     let gone = false
     syncPushSubscription()
       .then(ok => { if (!gone) setOn(ok) })
       .catch(() => navigator.serviceWorker.ready.then(reg => reg.pushManager.getSubscription()).then(sub => { if (!gone) setOn(!!sub) }).catch(() => {}))
     return () => { gone = true }
-  }, [supported, local])
+  }, [supported, local, fb])
 
   const toggle = async v => {
     setBusy(true)
     try {
-      if (local) {
+      if (fb) {
+        if (!v) {
+          setRestNotifyEnabled(false); closeRestDoneNotification()
+          await disablePush().catch(() => {})
+          setOn(false); toast(t('Notifications off'))
+        }
+        else {
+          const perm = await Notification.requestPermission()
+          if (perm !== 'granted') throw new Error('Notifications permission was not granted')
+          setRestNotifyEnabled(true)
+          // The full push subscribe against this project's functions. It can
+          // only succeed in the installed app with a signed-in account; any
+          // failure leaves the local layer on, which is the designed
+          // fallback, not an error worth surfacing over the switch.
+          await enablePush().catch(() => {})
+          setOn(true); toast(t('Notifications on'))
+        }
+      }
+      else if (local) {
         if (!v) { setRestNotifyEnabled(false); closeRestDoneNotification(); setOn(false); toast(t('Notifications off')) }
         else {
           const perm = await Notification.requestPermission()

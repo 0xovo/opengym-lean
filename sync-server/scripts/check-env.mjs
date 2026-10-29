@@ -7,6 +7,20 @@ const REQUIRED = [
   ['VITE_FB_PROJECT_ID', 'projectId from the firebaseConfig block of your web app'],
   ['VITE_FB_APP_ID', 'appId from the firebaseConfig block of your web app'],
 ]
+// Optional: the build works without these, but the named feature stays off.
+// The rest timer push (locked phone) needs the whole set: the VAPID pair for
+// /api/push/send, and the QStash token plus signing keys for the scheduling.
+// See SETUP-SYNC.md, the QStash section.
+const OPTIONAL = [
+  ['VAPID_PUBLIC_KEY', 'rest timer push alerts (locked phone) stay off'],
+  ['VAPID_PRIVATE_KEY', 'rest timer push alerts (locked phone) stay off'],
+  ['QSTASH_TOKEN', 'rest timer pushes are booked but never scheduled'],
+  ['QSTASH_CURRENT_SIGNING_KEY', '/api/push/send cannot verify QStash calls'],
+  ['QSTASH_NEXT_SIGNING_KEY', '/api/push/send cannot verify QStash calls'],
+]
+for (const [name, hint] of OPTIONAL) {
+  if (!String(process.env[name] || '').trim()) console.warn(`check-env: optional ${name} is not set: ${hint}.`)
+}
 const missing = REQUIRED.filter(([name]) => !String(process.env[name] || '').trim())
 if (missing.length) {
   console.error('Cannot build the sync version: these environment variables are missing in the Vercel project:')

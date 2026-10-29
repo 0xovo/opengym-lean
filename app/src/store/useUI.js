@@ -4,7 +4,8 @@ import { beep, chime, vibrate, alertBuzz } from '../lib/sound.js'
 import { restSoundOf } from '../lib/rest-sounds.js'
 import { api } from '../lib/api.js'
 import { t } from '../lib/i18n.js'
-import { deviceId } from '../lib/push.js'
+import { deviceId, fbBookRestTimer, fbCancelRestTimer } from '../lib/push.js'
+import { firebaseEnabled } from '../lib/firebase-config.js'
 import { MOBILE } from '../lib/mobile.js'
 import { armRestAlert, bindNativeRest, disarmRestAlert, holdRestAlert, toneNative } from '../lib/rest-alert.js'
 import { armRestAlertState, cancelRestAlertState, finishRestAlertState, restNotifyEnabled, showRestDoneNotification, closeRestDoneNotification, restWakeLockOn, restWakeLockOff } from '../lib/rest-notify.js'
@@ -18,6 +19,12 @@ import { accentValue } from '../lib/accent.js'
 // alert the phone in the gym was waiting for, because the server held one timer per account.
 const pushRestTimer = sec => { if (useStore.getState().user) api('/api/push/rest-timer', { method: 'POST', body: JSON.stringify({ seconds: sec, deviceId: deviceId() }) }).catch(() => {}) }
 const cancelPushRestTimer = () => { if (useStore.getState().user) api('/api/push/rest-timer/cancel', { method: 'POST', body: JSON.stringify({ deviceId: deviceId() }) }).catch(() => {}) }
+
+// Sync mode (Firebase build): the same cancel against this project's own push
+// booking, called beside every cancelPushRestTimer below. No store user is
+// ever set in that build, so the server call above stays a no-op there and
+// this one does the work. A no-op everywhere else.
+const fbCancelBookedRest = () => { if (firebaseEnabled) fbCancelRestTimer().catch(() => {}) }
 
 // Books the end of a rest with whatever can announce it while the app is not looking: in the
 // Android app a native alarm and the countdown notification, everywhere else (and wherever that
@@ -40,7 +47,17 @@ const bookRestEnd = (endsAt, totalSec, kind) => {
     if (!switching) pushRestTimer(Math.max(1, Math.round((endsAt - Date.now()) / 1000)))
     // No server session: the end is armed locally instead, and the screen is
     // held awake for the rest so the timer completes on time.
-    if (localRestNotify() && !switching) { restAlertState = armRestAlertState(restAlertState, endsAt); restWakeLockOn() }
+    if (localRestNotify() && !switching) {
+      restAlertState = armRestAlertState(restAlertState, endsAt); restWakeLockOn()
+      // Sync mode only, and only when notifications are on: the end is also
+      // booked with this project's push functions, the one path that can
+      // still fire once the OS suspends the app (phone locked, another app
+      // in front). Fire-and-forget: a failed booking changes nothing, the
+      // local alert above still stands.
+      if (firebaseEnabled && restNotifyEnabled() && notificationsSupported() && Notification.permission === 'granted') {
+        fbBookRestTimer(Math.max(1, Math.round((endsAt - Date.now()) / 1000))).catch(() => {})
+      }
+    }
     return
   }
   const { S } = useStore.getState()
@@ -221,7 +238,7 @@ const runRest = (set, get) => {
           if (fin.tone) { endTone(snd, endSound); alertBuzz([200, 100, 200]); get().flashTimer() }
         } else maybeRestNotification()
       }
-      cancelPushRestTimer()
+      cancelPushRestTimer(); fbCancelBookedRest()
       stopRestTicking()
       set({ timer: { ...tm, left: 0, ready: true } })
       return
@@ -333,7 +350,7 @@ export const useUI = create((set, get) => ({
     const tm = get().timer
     if (!tm || tm.ready || tm.paused) return
     stopRestTicking()
-    cancelPushRestTimer()
+    cancelPushRestTimer(); fbCancelBookedRest()
     if (localRestNotify()) { restAlertState = cancelRestAlertState(); restWakeLockOff() }
     const left = Math.max(1, Math.round((tm.endsAt - Date.now()) / 1000))
     holdRestAlert(left, tm.total)
@@ -405,7 +422,7 @@ export const useUI = create((set, get) => ({
     // its notifications down with it, or the alert fires after the user already moved on.
     disarmRestAlert()
     if (localRestNotify()) { restAlertState = cancelRestAlertState(); restWakeLockOff(); closeRestDoneNotification() }
-    if (get().timer) cancelPushRestTimer()
+    if (get().timer) { cancelPushRestTimer(); fbCancelBookedRest() }
     set({ timer: null })
   },
 
