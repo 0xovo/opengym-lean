@@ -7,6 +7,7 @@ import { t } from '../lib/i18n.js'
 import { deviceId } from '../lib/push.js'
 import { MOBILE } from '../lib/mobile.js'
 import { armRestAlert, bindNativeRest, disarmRestAlert, holdRestAlert, toneNative } from '../lib/rest-alert.js'
+import { armRestAlertState, cancelRestAlertState, finishRestAlertState, restNotifyEnabled, showRestDoneNotification, closeRestDoneNotification, restWakeLockOn, restWakeLockOff } from '../lib/rest-notify.js'
 import { useStore } from './useStore.js'
 import { REST_MAX } from '../lib/duration.js'
 import { accentValue } from '../lib/accent.js'
@@ -23,9 +24,25 @@ const cancelPushRestTimer = () => { if (useStore.getState().user) api('/api/push
 // alarm could not be set) the server's push. The web build books the push at once, as before.
 // A switch-sides pause (Workout.jsx SWITCH_SIDES_SEC) books no server push, whose words are "rest over":
 // it is ten seconds between the two sides of a hold, and the app is in your hand.
+// Running with no server session (local mode, the sync mode, a guest) is the
+// condition pushRestTimer no-ops under: nobody holds the booking, so the local
+// alert layer (lib/rest-notify.js) is the one that announces the end. Signed in
+// to a server, the server's push does it and the local layer stays out of it.
+const localRestNotify = () => !useStore.getState().user
+
+// The local rest alert state: the end of the rest currently counting down,
+// and whether it has been announced yet.
+let restAlertState = null
+
 const bookRestEnd = (endsAt, totalSec, kind) => {
   const switching = kind === 'switch'
-  if (!MOBILE) { if (!switching) pushRestTimer(Math.max(1, Math.round((endsAt - Date.now()) / 1000))); return }
+  if (!MOBILE) {
+    if (!switching) pushRestTimer(Math.max(1, Math.round((endsAt - Date.now()) / 1000)))
+    // No server session: the end is armed locally instead, and the screen is
+    // held awake for the rest so the timer completes on time.
+    if (localRestNotify() && !switching) { restAlertState = armRestAlertState(restAlertState, endsAt); restWakeLockOn() }
+    return
+  }
   const { S } = useStore.getState()
   armRestAlert(endsAt, { title: switching ? t('Switch sides') : t('Rest’s over. Next set!'), countdownTitle: switching ? t('Switch sides') : t('Rest'), totalSec, accent: accentValue(S), sound: !!S.sound, classic: restSoundOf(S) === 'classic', tone: restSoundOf(S), vibrate: S.vibrate !== false, alarmBuzz: S.vibrate !== false && !!S.vibrateOnSilent })
     .then(ok => {
@@ -192,7 +209,18 @@ const runRest = (set, get) => {
       // The native alarm is left armed: this tick can come a little early, and with the screen
       // locked it never runs at all.
       get().toast(t('Rest’s over. Next set!'))
-      if (!MOBILE) maybeRestNotification()
+      if (!MOBILE) {
+        if (localRestNotify()) {
+          // No push server behind this session: the local alert decides here.
+          // If the end passed while the app was away, it catches up with the
+          // tone and the banner; the rest's wake lock is done either way.
+          const fin = finishRestAlertState(restAlertState, { away: !seenLive, hidden: document.hidden, canNotify: restNotifyEnabled() && notificationsSupported() && Notification.permission === 'granted' })
+          restAlertState = fin.state
+          restWakeLockOff()
+          if (fin.notify) showRestDoneNotification(t('Rest’s over. Next set!'))
+          if (fin.tone) { endTone(snd, endSound); alertBuzz([200, 100, 200]); get().flashTimer() }
+        } else maybeRestNotification()
+      }
       cancelPushRestTimer()
       stopRestTicking()
       set({ timer: { ...tm, left: 0, ready: true } })
@@ -306,6 +334,7 @@ export const useUI = create((set, get) => ({
     if (!tm || tm.ready || tm.paused) return
     stopRestTicking()
     cancelPushRestTimer()
+    if (localRestNotify()) { restAlertState = cancelRestAlertState(); restWakeLockOff() }
     const left = Math.max(1, Math.round((tm.endsAt - Date.now()) / 1000))
     holdRestAlert(left, tm.total)
     set({ timer: { ...tm, left, paused: true } })
@@ -375,6 +404,7 @@ export const useUI = create((set, get) => ({
     // Skip, Dismiss, a rest replacing this one and "rest off" all take the native alarm and
     // its notifications down with it, or the alert fires after the user already moved on.
     disarmRestAlert()
+    if (localRestNotify()) { restAlertState = cancelRestAlertState(); restWakeLockOff(); closeRestDoneNotification() }
     if (get().timer) cancelPushRestTimer()
     set({ timer: null })
   },

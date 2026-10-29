@@ -18,6 +18,7 @@ import { scheduleModeOf, chooseFixedWeek, chooseRotation } from '../lib/rotation
 import { queueOf } from '../lib/queue.js'
 import { api, webauthnOK, passkeyRegister, passkeyError, IS_ANDROID } from '../lib/api.js'
 import { pushSupported, enablePush, disablePush, sendTestPush, syncPushSubscription } from '../lib/push.js'
+import { restNotifyEnabled, setRestNotifyEnabled, showRestDoneNotification, closeRestDoneNotification } from '../lib/rest-notify.js'
 import { wakeLockSupported } from '../lib/wakelock.js'
 import { t, tn, LANGS, INSTR_LANGS, EXERCISE_NAME_LANGS, baseLang, dateLocale } from '../lib/i18n.js'
 import { effectiveLang } from '../lib/default-lang.js'
@@ -1118,6 +1119,11 @@ function PushCard({ S, update, toast }) {
   const [on, setOn] = useState(false)
   const [busy, setBusy] = useState(false)
   const supported = pushSupported()
+  // No server session (local mode, the sync mode, a guest): no push server
+  // exists to hold a subscription, so the card runs on the local rest
+  // notifications (lib/rest-notify.js) and never touches the /api push path.
+  const user = useStore(s => s.user)
+  const local = !user
 
   // "On" means the server holds this browser's subscription, not merely that the browser has
   // one: a row the instance dropped (dead send, rebuilt db.json) left the switch on with nothing
@@ -1125,23 +1131,36 @@ function PushCard({ S, update, toast }) {
   // (offline), the browser's side is the best answer available.
   useEffect(() => {
     if (!supported) return
+    if (local) { setOn(restNotifyEnabled() && Notification.permission === 'granted'); return }
     let gone = false
     syncPushSubscription()
       .then(ok => { if (!gone) setOn(ok) })
       .catch(() => navigator.serviceWorker.ready.then(reg => reg.pushManager.getSubscription()).then(sub => { if (!gone) setOn(!!sub) }).catch(() => {}))
     return () => { gone = true }
-  }, [supported])
+  }, [supported, local])
 
   const toggle = async v => {
     setBusy(true)
     try {
-      if (!v) { await disablePush(); setOn(false); toast(t('Notifications off')) }
+      if (local) {
+        if (!v) { setRestNotifyEnabled(false); closeRestDoneNotification(); setOn(false); toast(t('Notifications off')) }
+        else {
+          const perm = await Notification.requestPermission()
+          if (perm !== 'granted') throw new Error('Notifications permission was not granted')
+          setRestNotifyEnabled(true); setOn(true); toast(t('Notifications on'))
+        }
+      }
+      else if (!v) { await disablePush(); setOn(false); toast(t('Notifications off')) }
       else { await enablePush(); setOn(true); toast(t('Notifications on')) }
     } catch (e) { toast(e.message || t('Could not change notification settings')) }
     setBusy(false)
   }
   const test = async () => {
-    try { await sendTestPush(); toast(t('Test sent! Should pop up any second')) }
+    try {
+      if (local) { if (!(await showRestDoneNotification(t('Rest’s over. Next set!')))) throw new Error(t('Test failed')) }
+      else await sendTestPush()
+      toast(t('Test sent! Should pop up any second'))
+    }
     catch (e) { toast(e.message || t('Test failed')) }
   }
 
@@ -1154,27 +1173,27 @@ function PushCard({ S, update, toast }) {
   return <>
     <Section
       title={t('Notifications')}
-      footer={on && S.reminder?.on
+      footer={on && !local && S.reminder?.on
         ? t("Only sent on days you have a routine planned and haven't logged a workout yet.") +
           (S.reminder?.tz ? ' ' + t('Timezone: {0} (auto-detected, updates if you travel).', S.reminder.tz) : '') +
           nudgeNote(S)
         : null}
     >
-      <Row icon="bell" iconTint="var(--red)" title={t('Push notifications')} subtitle={t('Rest-timer alerts, even if openGym is closed.')}>
+      <Row icon="bell" iconTint="var(--red)" title={local ? t('Notifications') : t('Push notifications')} subtitle={local ? undefined : t('Rest-timer alerts, even if openGym is closed.')}>
         <Switch checked={on} disabled={busy} onChange={toggle} />
       </Row>
-      {on && (
+      {on && !local && (
         <Row icon="calendar" iconTint="var(--orange)" title={t('Workout day reminder')}>
           <Switch checked={!!S.reminder?.on} onChange={() => update(s => { s.reminder = { ...(s.reminder || DEF.reminder), on: !s.reminder?.on, tz: localTZ() } })} />
         </Row>
       )}
-      {on && S.reminder?.on && (
+      {on && !local && S.reminder?.on && (
         <Row icon="clock" iconTint="var(--purple)" title={t('Reminder time')}>
           <input type="time" className="timef" value={S.reminder?.time || DEF.reminder.time}
             onChange={e => update(s => { s.reminder = { ...(s.reminder || DEF.reminder), time: e.target.value, tz: localTZ() } })} />
         </Row>
       )}
-      {on && S.reminder?.on && (
+      {on && !local && S.reminder?.on && (
         <NudgeRows S={S} setReminder={patch => update(s => { s.reminder = { ...(s.reminder || DEF.reminder), ...patch, tz: localTZ() } })} />
       )}
     </Section>

@@ -80,6 +80,14 @@ backup export/import. Still local-first, still AGPL-3.0, and full credit to
 [DuarteSantos/openGym](https://github.com/DuarteSantos8/openGym), see
 [NOTICE.md](NOTICE.md).
 
+**One addition**
+
+Rest timer alerts work with no server here. Upstream announces a finished rest
+with a push sent by its server; with no server to book the end with, this fork
+announces it locally instead (Settings, then Notifications): a system
+notification when a rest ends while the app is open or still alive, and a
+catch-up alert when you come back to the app after the end has passed.
+
 ## Why openGym
 
 Most workout apps keep your data on their servers, push you towards a subscription, or vanish
