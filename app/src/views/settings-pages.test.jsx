@@ -220,7 +220,7 @@ describe('the search lands on a row', () => {
       mount('reminders', 'Nudge me when I skip a planned workout', 'Push notifications')
       await act(async () => { await vi.advanceTimersByTimeAsync(1600) })
       expect(rowTitled('Push notifications').classList.contains('sp-flash')).toBe(true)
-      expect(mocks.toast).toHaveBeenCalledWith('Turn on push notifications first.')
+      expect(mocks.toast).toHaveBeenCalledWith('Allow notifications in your browser first.')
 
       // push on: the row appears once the server answers, and that row is the one flashed
       mocks.pushOn = true
@@ -394,7 +394,7 @@ describe('searchSettings', () => {
     expect(searchSettings('nudge', { ...guestWeb, user: { id: 'u' }, pushOK: true, reminderOn: true }, tr).map(h => h.title)).toEqual(['Nudge me when I skip a planned workout'])
     expect(searchSettings('nudge', { ...guestWeb, mobile: true, reminderOn: true }, tr).map(h => h.title)).toEqual(['Nudge me when I skip a planned workout'])
     expect(searchSettings('coach', guestWeb, tr)).toEqual([])
-    expect(searchSettings('coach', { ...guestWeb, mobile: true }, tr)[0].page).toBe('coach')
+    expect(searchSettings('coach', { ...guestWeb, mobile: true }, tr)).toEqual([])   // the Coach page is gone everywhere
     expect(searchSettings('vibrate silent', { ...guestWeb, mobile: true, android: true }, tr).map(h => h.title)).toEqual(['Vibrate on silent too'])
     expect(searchSettings('   ', guestWeb, tr)).toEqual([])
   })

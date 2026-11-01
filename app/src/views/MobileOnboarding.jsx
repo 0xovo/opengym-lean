@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from 'react'
 import { useStore } from '../store/useStore.js'
 import { useUI } from '../store/useUI.js'
 import { t } from '../lib/i18n.js'
-import Icon from '../components/Icon.jsx'
 import { Button } from '../components/ui.jsx'
 import { askAddDeviceData } from '../sheets.jsx'
 import { normalizeServerUrl } from '../lib/remote.js'
@@ -120,25 +119,8 @@ export function ConnectSheet({ close, initialUrl = '', again = false }) {
   </>
 }
 
-export default function MobileOnboarding() {
-  const { chooseLocalMode } = useStore()
-  const head = <>
-    <div style={{ fontSize: 54, display: 'flex', justifyContent: 'center', color: 'var(--acc)' }}><Icon name="dumbbell" /></div>
-    <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-.028em', margin: '10px 0 4px' }}>openGym</h1>
-  </>
-  const wrap = { display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '78vh', textAlign: 'center' }
-  return (
-    <div className="narrow" style={wrap}>
-      {head}
-      <div className="muted" style={{ marginBottom: 34 }}>{t('How do you want to use openGym?')}</div>
-      <Button variant="primary" icon="lock" onClick={() => chooseLocalMode()}>{t('Use on this device')}</Button>
-      <div style={{ height: 10 }} />
-      <Button icon="cloud" onClick={() => useUI.getState().openSheet(close => <ConnectSheet close={close} />)}>{t('Connect to my server')}</Button>
-      <div className="dim small" style={{ marginTop: 26, lineHeight: 1.5 }}>
-        {t('Local keeps everything on this phone. Connecting syncs to your own openGym server instead. You can switch later in Settings.')}
-      </div>
-      <div style={{ height: 18 }} />
-      <Button icon="gear" onClick={() => openCfAccess()}>{t('Connection settings')}</Button>
-    </div>
-  )
-}
+// The first-launch screen that used to live here as this file's default export is gone: it
+// was the native build's "keep it on this device or connect to a server" choice, gated on a
+// flag only the native boot path sets, so it could never render in the web build. What stays
+// are the two sheets above — ConnectSheet and CfAccessSheet — which live server-connect flows
+// (ServerSync) still open from here.

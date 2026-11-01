@@ -16,7 +16,6 @@ export const PAGES = {
   units: { title: 'Units & language', icon: 'ruler', tint: 'var(--teal)' },
   equipment: { title: 'Equipment', icon: 'kettlebell', tint: 'var(--indigo)' },
   look: { title: 'Look & Home', icon: 'palette', tint: 'var(--purple)' },
-  coach: { title: 'AI Coach', icon: 'sparkles', tint: 'var(--green)' },
   data: { title: 'Data & backup', icon: 'folder', tint: 'var(--blue)' },
   about: { title: 'About & updates', icon: 'info', tint: 'var(--grey)' },
   account: { title: 'Account', icon: 'personCircle', tint: 'var(--grey)' },
@@ -29,12 +28,10 @@ export const ROOT_GROUPS = [['workout', 'alerts', 'reminders'], ['plan', 'units'
 
 /**
  * Whether a page exists for this device and profile. Reminders need a push server (signed in) or
- * the phone's own notifications; the Coach page is the phone's Coach setup (the web app's Coach
- * runs on the server, set up by its admin).
+ * the phone's own notifications.
  */
 export function pageVisible(page, ctx) {
   if (page === 'reminders') return !!(ctx.user || ctx.mobile)
-  if (page === 'coach') return !!ctx.mobile
   return page in PAGES
 }
 
@@ -119,9 +116,7 @@ export const SEARCH = [
   { page: 'data', title: 'Import from Hevy', icon: 'key', tint: 'var(--teal)', kw: 'hevy api import' },
   { page: 'data', title: 'Photos & videos', icon: 'image', tint: 'var(--teal)', kw: 'media storage photos videos upload', when: c => c.hasMedia },
   { page: 'data', title: 'Reset everything', icon: 'trash', tint: 'var(--red)', kw: 'delete wipe reset erase' },
-  // About & updates
-  { page: 'about', title: 'Check for updates', icon: 'download', tint: 'var(--green)', kw: 'update apk android version', when: c => c.mobile && c.android },
-  { page: 'about', title: 'Get the Android app', icon: 'download', tint: 'var(--green)', kw: 'apk android download app', when: c => !c.mobile },
+  // About
   { page: 'about', title: 'Version', icon: 'info', tint: 'var(--grey)', kw: 'version about licence license source code open source' },
   { page: 'about', title: 'In Chrome: ⋮ menu → Add to Home screen', icon: 'share', tint: 'var(--blue)', kw: 'install app home screen tip pwa', when: c => c.installTip && c.androidWeb },
   { page: 'about', title: 'In Safari: Share → Add to Home Screen', icon: 'share', tint: 'var(--blue)', kw: 'install app home screen tip pwa', when: c => c.installTip && !c.androidWeb },

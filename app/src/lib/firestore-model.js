@@ -75,6 +75,13 @@ export function joinDocs({ meta = {}, lists = {} } = {}) {
     const m = lists[coll]
     S[field] = m ? [...m.values()].map(sanitize) : []
   }
+  // The gym check-in fields of an older build ride in the meta doc and in their own list
+  // doc. The feature is gone, so they are dropped here — after both halves are assembled,
+  // in the one place cloud state becomes a state — and a merge or a write-back can never
+  // resurrect them (see dropRemovedFields in store/useStore.js).
+  delete S.gymCards
+  delete S.lastGymCardId
+  delete S.checkIn
   return S
 }
 

@@ -112,8 +112,8 @@ export function restoreRoutine(s, snap) {
  * not 60 kg added to a push-up. The same goes for an assistance machine, where the number is
  * help rather than load: 40 kg off a pull-up is not 40 kg on a pulldown. There the weight goes
  * back to 0. The bodyweight, assisted and per-side flags describe the movement, not the
- * prescription, so they are dropped and the new exercise follows its own, the way the Coach's
- * swap does (lib/coach.js): a split squat's "per side" would split a back squat's reps into L/R.
+ * prescription, so they are dropped and the new exercise follows its own: a split squat's
+ * "per side" would split a back squat's reps into L/R.
  *
  * What is not carried is history. Progress belongs to a routine and an exercise together (#216),
  * so the new exercise starts on its own line — its own sessions in this routine, and until there

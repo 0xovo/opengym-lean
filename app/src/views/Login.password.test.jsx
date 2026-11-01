@@ -30,7 +30,7 @@ vi.mock('../store/useUI.js', () => {
   return { useUI }
 })
 vi.mock('../lib/api.js', () => ({
-  webauthnOK: () => mocks.webauthn, passkeyLogin: vi.fn(), passkeyRegister: vi.fn(), BIO: 'your fingerprint', bio: () => 'your fingerprint',
+  webauthnOK: () => mocks.webauthn, passkeyLogin: vi.fn(), passkeyRegister: vi.fn(),
   api: vi.fn(), passkeyAssertion: vi.fn(), passwordLogin: vi.fn(), passwordRegister: vi.fn(), passwordResetRedeem: vi.fn(),
 }))
 vi.mock('../lib/demo.js', () => ({ DEMO: false, REPO: 'https://example.invalid' }))
@@ -55,7 +55,7 @@ describe('Login with password sign-in', () => {
   it('an instance without it looks exactly as before', () => {
     const page = mount(<Login />)
     expect(buttons(page)).not.toContain('Sign in with password')
-    expect(page.textContent).toContain('Passkeys use your fingerprint. No passwords to remember.')
+    expect(page.textContent).toContain('Passkeys use your device lock. No passwords to remember.')
     mocks.webauthn = false
     const noPasskeys = mount(<Login />)
     expect(noPasskeys.textContent).toContain("This browser doesn't do passkeys, but you can still use openGym locally on this device.")
@@ -66,7 +66,7 @@ describe('Login with password sign-in', () => {
     mocks.config = { password_login: true, allow_guest: true }
     const page = mount(<Login />)
     expect(buttons(page).slice(0, 3)).toEqual(['Sign in with passkey', 'Sign in with password', 'Create new profile'])
-    expect(page.textContent).toContain('Passkeys use your fingerprint. A password works too, where passkeys do not.')
+    expect(page.textContent).toContain('Passkeys use your device lock. A password works too, where passkeys do not.')
     act(() => button(page, 'Sign in with password').click())
     const sheet = mount(mocks.sheets[0](() => {}))
     expect(sheet.querySelector('h3').textContent).toBe('Sign in with password')

@@ -3,7 +3,7 @@
 // exercise's picture (mocked here — lib/media-ingest.js has its own tests), lands in the local
 // store as pending and on the saved record, stamped; the grid shows posters and opens the
 // full-screen viewer, where one can be removed; a seventh is refused.
-// Since 2026-10-29 the section is mounted nowhere in the workout flow (feras had it removed
+// Since 2026-10-29 the section is mounted nowhere in the workout flow (it was removed
 // from the detail sheet and the finish summary; the component and the data layer stay), so
 // the behavior tests mount the section directly, and two flow tests at the end of the first
 // group assert its absence where it used to appear.

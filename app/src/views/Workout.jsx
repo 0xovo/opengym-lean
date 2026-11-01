@@ -1912,7 +1912,7 @@ function ActiveWorkout() {
     <div className={'whdr' + (listMode ? ' stick' : '')} ref={hdrRef}>
     {/* ⌄ leaves the screen and keeps the session running (the tab bar's Resume brings it back);
         in the editor of a saved workout it is the ✕ that closes the editor. Discard is in the ⋯
-        menu. There is no Finish up here (feras, 2026-10-29): finishing is the button under the
+        menu. There is no Finish up here (2026-10-29): finishing is the button under the
         session (cards: the outline one; list: the bottom one), and in cards mode the header's
         right side carries the Prev/Next chevrons where the pill used to sit. */}
     <div className="hdr whdr-bar">

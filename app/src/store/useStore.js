@@ -21,7 +21,6 @@ import { appBase } from '../lib/app-base.js'
 import { linkTokenFromSearch, stripLinkFromUrl } from '../lib/device-link.js'
 import { loadRemote, chooseLocal, forgetRemote, connect, normalizeServerUrl, renewToken } from '../lib/remote.js'
 import { loadCfAccess } from '../lib/cf-access.js'
-import { loadCoachDevice, saveCoachDevice, coachDeviceSettings } from '../lib/coach-device.js'
 import { RTL_LANGS } from '../lib/i18n-core.js'
 import { DEFAULT_TEMPLATE_ID } from '../lib/structuralBalanceTemplates.js'
 
@@ -176,22 +175,6 @@ export const DEF = {
   // (lib/dumbbells.js). Single bells, lightest first. Kept per unit and stamped like the plates;
   // absent or empty = no list, and dumbbell lifts step by their increment as before.
   dumbbells: {},
-  // Gym check-in cards (see views/CheckIn.jsx). Each is a membership
-  // code shown as a QR/barcode at the gym's turnstile — added by typing it, importing a photo
-  // of the card, or scanning it. We only ever keep the code's VALUE, never a photo: the image
-  // is regenerated from `value` every time it's shown (lib/qr.js). `fmt` is the barcode symbology
-  // ('qrcode' | 'ean13' | 'code128' | … — lower-cased BarcodeFormat) so it renders as the same
-  // kind of code the gym issued. Just data, so it syncs and backs up like everything else.
-  //   [{ id, label, value, fmt }]
-  gymCards: [],
-  // The card the check-in screen last settled on, so it reopens where you left it (handy when
-  // you have more than one gym). Holds a gymCards id, or null before any card exists / is chosen;
-  // a stale id (card since removed) is simply ignored by the view.
-  lastGymCardId: null,
-  // Whether the check-in feature is on at all (Settings toggle). Off hides the Home
-  // card and the /checkin route; the saved gymCards stay so turning it back on restores them.
-  // Defaults on; an older profile without the key reads as on (`!== false`).
-  checkIn: true,
   // Whether the body-weight summary card is shown on Home. Off only hides that card: existing
   // entries, Stats, imports and the separate pre-workout weigh-in flow keep working.
   // Defaults on; an older profile without the key reads as on (`!== false`).
@@ -276,12 +259,20 @@ export function restartedState(cur) {
   return s
 }
 
+// Fields of a feature this build no longer has (the gym check-in cards: their list, the
+// last-shown card, the on/off flag). A state saved by an older build — on this device, in a
+// pulled account copy, or in an imported backup — still carries them. They are dropped
+// wherever a foreign state becomes the live one, so the fields neither linger in S nor
+// travel back out through sync and resurrect themselves on other devices.
+const REMOVED_FIELDS = ['gymCards', 'lastGymCardId', 'checkIn']
+export const dropRemovedFields = s => { if (s) for (const k of REMOVED_FIELDS) delete s[k]; return s }
+
 function loadState() {
   try {
     const raw = localStorage.getItem(KEY)
     if (raw) {
       const saved = JSON.parse(raw)
-      const s = sanitizeAccent(Object.assign(clone(DEF), saved))
+      const s = dropRemovedFields(sanitizeAccent(Object.assign(clone(DEF), saved)))
       if (!saved.lang) s.lang = detectedLang()
       return s
     }
@@ -300,7 +291,7 @@ const hasData = st => !!((st.workouts || []).length || (st.routines || []).lengt
 // session belongs to the device that is currently running it.
 export function restoredStateFor(local, remote, dirty = false) {
   if (!remote || (hasData(local) && (dirty || (remote._ts || 0) < (local._ts || 0)))) return null
-  const next = sanitizeAccent(Object.assign(clone(DEF), remote))
+  const next = dropRemovedFields(sanitizeAccent(Object.assign(clone(DEF), remote)))
   if (local.active) next.active = local.active
   return next
 }
@@ -1311,12 +1302,6 @@ export const useStore = create((set, get) => {
     // A one-time device-link code this page was opened with (?link=, #95), until it is redeemed.
     // Never persisted: the code is good for minutes and belongs to this one visit.
     linkCode: null,
-    // Mobile build only: how the Coach runs on this phone — { mode: 'off'|'server'|'byok',
-    // provider, model, baseUrl } from lib/coach-device.js. Never the key, never a proposal.
-    coachLocal: null,
-    async setCoachLocal(patch) {
-      set({ coachLocal: coachDeviceSettings(await saveCoachDevice(patch)) })
-    },
 
     // Mutate a draft of S via producer fn, then persist + schedule sync. Every routine the change
     // touched carries the time of it, for a conflict to keep the version edited last.
@@ -1463,7 +1448,7 @@ export const useStore = create((set, get) => {
     // never takes the reset stamp back (keepReset).
     replaceState(S, push = false, { baseRev = null, baseWid } = {}) {
       if (push) { if (baseRev != null) replaceRev = { rev: baseRev, wid: baseWid }; else forceNext = true }
-      persist(keepReset(get().S, clone(S)), push)
+      persist(keepReset(get().S, dropRemovedFields(clone(S))), push)
     },
 
     // Fires after the moments where losing local data would actually hurt — a workout just
@@ -1843,7 +1828,6 @@ export const useStore = create((set, get) => {
         const remote = await loadRemote()
         // Before the first request: a server behind Cloudflare Access answers nothing without it.
         await loadCfAccess({ pairedBase: remote?.mode === 'remote' ? remote.base : '' })
-        set({ coachLocal: coachDeviceSettings(await loadCoachDevice()) })
         if (remote?.mode === 'remote') {
           setRemoteAuth(remote.base, remote.token)
           pairedBase = remote.base || null

@@ -1,6 +1,6 @@
 import { useStore } from '../store/useStore.js'
 import { useUI } from '../store/useUI.js'
-import { webauthnOK, passkeyLogin, passkeyRegister, passkeyError, bio } from '../lib/api.js'
+import { webauthnOK, passkeyLogin, passkeyRegister, passkeyError } from '../lib/api.js'
 import { hasData } from '../store/useStore.js'
 import { t } from '../lib/i18n.js'
 import { DEMO, REPO } from '../lib/demo.js'
@@ -54,7 +54,7 @@ function RegisterSheet({ close }) {
   return <>
     <h3>{t('Create your profile')}</h3>
     {choose}
-    <div className="muted small" style={{ marginBottom: 14 }}>{t('Pick a name, then confirm with {0}. The passkey lives on your device, so no password needed.', bio())}</div>
+    <div className="muted small" style={{ marginBottom: 14 }}>{t('Pick a name, then confirm with your device lock. The passkey lives on your device, so no password needed.')}</div>
     <input ref={ref} className="input" placeholder={t('Your name')} maxLength={40} value={name} onChange={e => setName(e.target.value)} />
     {inviteOnly && <>
       <div style={{ height: 10 }} />
@@ -140,7 +140,7 @@ export default function Login() {
         // so say that plainly instead of offering a local profile that cannot be created.
         : t("This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.")}</div>}
       {canGuest && <Button variant="ghost" className="dim" onClick={() => setGuest(true)}>{t('Continue without account')}</Button>}
-      <div className="dim small" style={{ marginTop: 26, lineHeight: 1.5 }}>{pwOn ? t('Passkeys use {0}. A password works too, where passkeys do not.', bio()) : t('Passkeys use {0}. No passwords to remember.', bio())}<br />{t('Each profile keeps its own plan, workouts & body weight.')}</div>
+      <div className="dim small" style={{ marginTop: 26, lineHeight: 1.5 }}>{pwOn ? t('Passkeys use your device lock. A password works too, where passkeys do not.') : t('Passkeys use your device lock. No passwords to remember.')}<br />{t('Each profile keeps its own plan, workouts & body weight.')}</div>
     </div>
   )
 }

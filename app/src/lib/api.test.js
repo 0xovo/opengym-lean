@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { webauthnOK, bio, vault, BIO, VAULT, passkeyError } from './api.js'
+import { webauthnOK, vault, VAULT, passkeyError } from './api.js'
 import de from '../locales/de.js'
 import { _setLangState } from './i18n-core.js'
 
@@ -174,15 +174,14 @@ describe('passkeyAssertion', () => {
   })
 })
 
-// QA 1.3.9: "confirm with {0}" was translated and {0} was not — a German sign-in page read
-// "…bestätige mit your fingerprint, face or PIN".
-describe('bio / vault', () => {
+// QA 1.3.9: a platform phrase inside a translated sentence was itself translated — the vault
+// phrase ("iCloud Keychain" and friends) still works that way. The biometric phrase that used
+// to sit beside it is gone: passkey copy now says "your device lock" in every language.
+describe('vault', () => {
   afterEach(() => _setLangState('en', {}, null, null))
   it('reads the platform phrase in the UI language', () => {
-    expect(bio()).toBe(BIO)
     expect(vault()).toBe(VAULT)
-    _setLangState('de', { [BIO]: 'BIO-de', [VAULT]: 'VAULT-de' }, null, null)
-    expect(bio()).toBe('BIO-de')
+    _setLangState('de', { [VAULT]: 'VAULT-de' }, null, null)
     expect(vault()).toBe('VAULT-de')
   })
 })

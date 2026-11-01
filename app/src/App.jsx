@@ -28,7 +28,6 @@ import RestTimer from './components/RestTimer.jsx'
 import TimerFlash from './components/TimerFlash.jsx'
 import { openDeviceLinkRedeem } from './components/Passkeys.jsx'
 import Login from './views/Login.jsx'
-import MobileOnboarding from './views/MobileOnboarding.jsx'
 import Home from './views/Home.jsx'
 import Plan from './views/Plan.jsx'
 import RoutineEdit from './views/RoutineEdit.jsx'
@@ -40,7 +39,6 @@ import Muscles from './views/Muscles.jsx'
 import StructuralBalance from './views/StructuralBalance.jsx'
 import ProgressPhotos from './views/ProgressPhotos.jsx'
 import { SettingsRoute } from './views/Settings.jsx'
-import Admin from './views/Admin.jsx'
 import Measurements from './views/Measurements.jsx'
 
 // last known scrollY per route, so back-navigation can put the page where it was
@@ -76,7 +74,6 @@ function Shell() {
   // native side as an alarm (#375). buzzAsAlarm answers false off Android, so iOS buzzes as before.
   useEffect(() => { setAlarmBuzzer(MOBILE && S.vibrate !== false && S.vibrateOnSilent ? buzzAsAlarm : null) }, [S.vibrate, S.vibrateOnSilent])
   const isGuest = useStore(s => s.isGuest())
-  const needsMobileOnboarding = useStore(s => s.needsMobileOnboarding)
   const langV = useLang()   // re-renders the whole shell when the language (pack) changes
   useEffect(() => { setNav(navigate) }, [navigate])
   const lastEditPath = useRef(loc.pathname)
@@ -179,8 +176,7 @@ function Shell() {
     document.body.classList.toggle('no-tabbar', inWorkout)
     return () => document.body.classList.remove('no-tabbar')
   }, [inWorkout])
-  // The first-launch card has no tabs either: they changed the route behind it.
-  const noTabs = inWorkout || needsMobileOnboarding
+  const noTabs = inWorkout
 
   const authed = user || isGuest
   if (!ready && !authed) return (
@@ -197,7 +193,7 @@ function Shell() {
           re-mounts the boundary, so the tab bar is always a way out */}
       <div id="app" className="vfade" key={loc.pathname}>
         <ErrorBoundary>
-          {!authed ? <Login /> : needsMobileOnboarding ? <MobileOnboarding /> : (
+          {!authed ? <Login /> : (
             <Routes>
               <Route path="/home" element={<Home />} />
               <Route path="/plan" element={<Plan />} />
@@ -212,7 +208,6 @@ function Shell() {
               <Route path="/measurements" element={<Measurements />} />
               <Route path="/settings" element={<SettingsRoute />} />
               <Route path="/settings/:page" element={<SettingsRoute />} />
-              <Route path="/admin" element={user?.admin ? <Admin /> : <Navigate to="/home" replace />} />
               <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>
           )}

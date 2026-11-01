@@ -3340,8 +3340,8 @@ describe('the workout screen chrome', () => {
   const click = async el => { await act(async () => { el.dispatchEvent(new dom.Event('click', { bubbles: true })) }) }
   const openMore = () => click(container.querySelector('button[aria-label="More"]'))
 
-  // Until 2026-10-29 the header carried a Finish pill that opened the Finish sheet; feras
-  // had it removed. Finishing now lives under the session, the header's right side carries
+  // Until 2026-10-29 the header carried a Finish pill that opened the Finish sheet; it
+  // was removed. Finishing now lives under the session, the header's right side carries
   // the cards-mode Prev/Next chevrons, and Discard stays in the ⋯ menu (covered by the
   // requestDiscard tests above).
   it('has no Finish pill, Prev/Next chevrons in the header instead, and a ⌄ that leaves the screen with the session still running', async () => {

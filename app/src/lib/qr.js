@@ -1,16 +1,11 @@
-// QR rendering for the gym check-in cards (see views/CheckIn.jsx).
-//
-// We never store a photo of a membership card, only its decoded value (+ its symbology in
-// `fmt`). The picture a turnstile scanner reads is regenerated from that value every time the
-// card is shown, here.
+// QR rendering (components/QrCanvas.jsx): the pairing codes that add a profile on another
+// device. A code's picture is regenerated from its value every time it is shown, here.
 //
 // lean-qr (MIT, see NOTICE.md) is loaded with a dynamic import so its ~4kB only loads when a
-// card is actually shown, on every platform — the PWA renders the same code as the app.
+// code is actually shown, on every platform — the PWA renders the same code as the app.
 //
-// Scope: lean-qr generates QR codes only. A gym card is virtually always a QR code, and the
-// capture flow (lib/scan.js) refuses any symbology we cannot faithfully reproduce, so a stored
-// card is guaranteed renderable here — canRenderFmt() is the single source of that truth, shared
-// by both sides.
+// Scope: lean-qr generates QR codes only. canRenderFmt() is the single source of which
+// symbologies can be faithfully reproduced here.
 
 let _leanqr = null
 

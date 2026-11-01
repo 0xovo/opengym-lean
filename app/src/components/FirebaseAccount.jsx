@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useUI } from '../store/useUI.js'
 import { t } from '../lib/i18n.js'
-import { bio } from '../lib/api.js'
 import { Button } from './ui.jsx'
 
 // Firebase mode (Phase 2): passkey sign-in + Firestore sync controls. The sync engine and
@@ -49,7 +48,7 @@ export function FirebaseSignIn({ onSignedIn } = {}) {
   )
   return <>
     <div className="muted small" style={{ marginBottom: 12 }}>
-      {t('Sign in with {0}, no password. First time here, create the account with your first passkey.', bio())}
+      {t('Sign in with your passkey, no password. First time here, create the account with your first passkey.')}
     </div>
     <input className="input" placeholder={t('Username')} maxLength={40} value={name}
       onChange={e => setName(e.target.value)} autoComplete="username" />
