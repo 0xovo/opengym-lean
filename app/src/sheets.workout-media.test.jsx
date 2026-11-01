@@ -1,8 +1,12 @@
 // @vitest-environment happy-dom
-// A logged workout's photos and videos in its detail sheet and the history row: a picked file
-// goes through the same ingest as an exercise's picture (mocked here — lib/media-ingest.js has its
-// own tests), lands in the local store as pending and on the saved record, stamped; the grid shows
-// posters and opens the full-screen viewer, where one can be removed; a seventh is refused.
+// A logged workout's photos and videos: a picked file goes through the same ingest as an
+// exercise's picture (mocked here — lib/media-ingest.js has its own tests), lands in the local
+// store as pending and on the saved record, stamped; the grid shows posters and opens the
+// full-screen viewer, where one can be removed; a seventh is refused.
+// Since 2026-10-29 the section is mounted nowhere in the workout flow (feras had it removed
+// from the detail sheet and the finish summary; the component and the data layer stay), so
+// the behavior tests mount the section directly, and two flow tests at the end of the first
+// group assert its absence where it used to appear.
 import React, { act } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRoot } from 'react-dom/client'
@@ -15,7 +19,8 @@ import { useUI } from './store/useUI.js'
 import { _setLangState } from './lib/i18n-core.js'
 import { bindUI } from './components/ui.jsx'
 import { createMediaStore, memoryBackend, _setMediaStore } from './lib/media-store.js'
-import { workoutDetailSheet, WorkoutRow } from './sheets.jsx'
+import { workoutDetailSheet, WorkoutRow, finishWorkout } from './sheets.jsx'
+import { EXDB } from './lib/exercises-data.js'
 import WorkoutMediaSection, { openWorkoutMediaViewer } from './components/WorkoutMedia.jsx'
 import { WORKOUT_MEDIA_MAX } from './lib/media-refs.js'
 
@@ -79,15 +84,13 @@ afterEach(() => {
 
 describe('a workout\'s photos and videos', () => {
   it('asks for images and videos, several at once', () => {
-    workoutDetailSheet(S().workouts[0])
-    const input = renderTop().querySelector('.wmedia input[type="file"]')
+    const input = render(<WorkoutMediaSection w={S().workouts[0]} />).querySelector('.wmedia input[type="file"]')
     expect(input.getAttribute('accept')).toBe('image/*,video/*')
     expect(input.multiple).toBe(true)
   })
 
   it('a picked photo and video land on the saved record, stamped, with their files pending — never the file name', async () => {
-    workoutDetailSheet(S().workouts[0])
-    const host = renderTop()
+    const host = render(<WorkoutMediaSection w={S().workouts[0]} />)
     await pick(host, 2)
     const w = S().workouts[0]
     expect(w.media).toEqual([refOf(1), refOf(2, 'video')])
@@ -101,8 +104,7 @@ describe('a workout\'s photos and videos', () => {
   it('shows posters in the grid, and opens the viewer on the one tapped', async () => {
     useStore.setState(s => ({ S: { ...s.S, workouts: [workout({ media: [refOf(1), refOf(2, 'video')] })] } }))
     await media.put(hex(101), new Blob(['p']), { mime: 'image/webp' })
-    workoutDetailSheet(S().workouts[0])
-    const host = renderTop()
+    const host = render(<WorkoutMediaSection w={S().workouts[0]} />)
     await settle()
     expect(host.querySelector('.wmedia-item img.thumb')?.getAttribute('src')).toBe('blob:t/1')
     act(() => host.querySelectorAll('.wmedia-item')[1].click())
@@ -117,8 +119,7 @@ describe('a workout\'s photos and videos', () => {
 
   it('Remove in the viewer asks, then takes it off the record and stamps it', async () => {
     useStore.setState(s => ({ S: { ...s.S, workouts: [workout({ media: [refOf(1), refOf(3)] })] } }))
-    workoutDetailSheet(S().workouts[0])
-    const detail = renderTop()
+    const detail = render(<WorkoutMediaSection w={S().workouts[0]} />)
     act(() => detail.querySelectorAll('.wmedia-item')[0].click())
     const viewer = renderTop()
     act(() => viewer.querySelector('button[aria-label="Remove"]').click())
@@ -131,8 +132,7 @@ describe('a workout\'s photos and videos', () => {
   })
 
   it('a full workout offers no Add and says how many fit; a seventh picked in a batch is refused', async () => {
-    workoutDetailSheet(S().workouts[0])
-    const host = renderTop()
+    const host = render(<WorkoutMediaSection w={S().workouts[0]} />)
     await pick(host, WORKOUT_MEDIA_MAX + 1, WORKOUT_MEDIA_MAX)
     expect(S().workouts[0].media).toHaveLength(WORKOUT_MEDIA_MAX)
     expect(h.ingest).toHaveBeenCalledTimes(WORKOUT_MEDIA_MAX)   // the seventh is never ingested
@@ -143,8 +143,7 @@ describe('a workout\'s photos and videos', () => {
 
   it('a batch bigger than the room left ingests only what fits', async () => {
     useStore.setState(s => ({ S: { ...s.S, workouts: [workout({ media: [1, 3, 5, 7].map(n => refOf(n + 20)) })] } }))
-    workoutDetailSheet(S().workouts[0])
-    const host = renderTop()
+    const host = render(<WorkoutMediaSection w={S().workouts[0]} />)
     await pick(host, 5, 2)
     expect(h.ingest).toHaveBeenCalledTimes(2)
     expect(S().workouts[0].media).toHaveLength(WORKOUT_MEDIA_MAX)
@@ -152,16 +151,28 @@ describe('a workout\'s photos and videos', () => {
     expect([...media.pendingNow()]).toHaveLength(4)   // two files, each with its poster
   })
 
-  it('a server without media storage: no section while there is nothing; with some, no Add and why', () => {
+  it('the detail sheet has no section any more, whatever the server keeps, and stored media stays on the record', () => {
     useStore.setState({ user: { id: 'u1', name: 'One' }, config: { passkeys: true } })
     workoutDetailSheet(S().workouts[0])
     expect(renderTop().querySelector('.wmedia')).toBeNull()
     useStore.setState(s => ({ S: { ...s.S, workouts: [workout({ media: [refOf(1)] })] } }))
     workoutDetailSheet(S().workouts[0])
     const host = renderTop()
-    expect(host.querySelectorAll('.wmedia-item')).toHaveLength(1)
-    expect(host.querySelector('.wmedia-add')).toBeNull()
-    expect(host.textContent).toContain('Your server does not store photos and videos yet.')
+    expect(host.querySelector('.wmedia')).toBeNull()
+    expect(host.textContent).not.toContain('Photos & videos')
+    expect(S().workouts[0].media).toEqual([refOf(1)])   // removing the section deleted nothing
+  })
+
+  it('the finish summary has no section either', () => {
+    const st = structuredClone(DEF)
+    st.active = { id: 'fin', d: '2026-09-15', start: Date.now() - 20 * 60000, routineId: null, name: 'Push', bw: null, cur: 0,
+      entries: [{ id: EXDB[0].id, target: { mode: 'reps', sets: 1, reps: 5, weight: 40 }, sets: [{ w: 40, r: 5, done: true }] }] }
+    useStore.setState({ S: st, user: null, config: null })
+    act(() => finishWorkout())
+    const host = renderTop()
+    expect(host.textContent).toContain('Workout complete!')
+    expect(host.querySelector('.wmedia')).toBeNull()
+    expect(host.textContent).not.toContain('Photos & videos')
   })
 
   it('signed in, Add is offered only when the server says a workout may carry media', () => {

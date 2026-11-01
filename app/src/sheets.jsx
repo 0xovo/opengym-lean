@@ -14,7 +14,7 @@ import { nav, closeThenNav, navToWorkout } from './lib/nav.js'
 import { buildStarterPlan, starterPlanDays, starterPlanOptions } from './lib/starter.js'
 import Media, { Thumb } from './components/Media.jsx'
 import CustomMediaField from './components/CustomMediaField.jsx'
-import WorkoutMediaSection, { workoutMediaCount } from './components/WorkoutMedia.jsx'
+import { workoutMediaCount } from './components/WorkoutMedia.jsx'
 import { mediaOf, normalizeMediaRef, cleanUrl, workoutMediaOf } from './lib/media-refs.js'
 import { syncMedia } from './lib/media-sync.js'
 import LineChart from './components/LineChart.jsx'
@@ -2532,8 +2532,6 @@ function WorkoutDetail({ w, close }) {
         {entryRows(g.units)}
       </div>
     }) : entryRows(groups[0]?.units || [])}
-    {/* Progress photos and form-check videos: added and removed right here, on the saved record. */}
-    <WorkoutMediaSection w={w} />
     <div className="small muted" style={{ margin: '4px 0 6px' }}>{t('Session note')}</div>
     <textarea ref={noteRef} className="input" rows={2} maxLength={NOTE_MAX} value={note}
       placeholder={t('How the session went as a whole.')}
@@ -3325,9 +3323,6 @@ function FinishSummary({ w, prs, e1prs = [], close }) {
     <div style={{ height: 14 }} />
     <LastAndNext st={st} w={w} />
     <CardioDone st={st} w={w} />
-    {/* The moment for a progress photo or the clip of a set: the workout is already saved, so
-        what is added here goes straight onto its record. */}
-    <div style={{ textAlign: 'start' }}><WorkoutMediaSection w={w} hint /></div>
     <Button variant="primary" onClick={() => closeThenNav(close, '/home')}>{t('Nice!')}</Button>
   </div>
 }
@@ -3341,10 +3336,11 @@ export function finishWorkout() {
   if (done < total) { confirmSheet({ title: t('Finish early?'), message: tn('{0} set still unchecked. Finish the workout now?', '{0} sets still unchecked. Finish the workout now?', total - done), confirmText: t('Finish workout'), onConfirm: doFinishWorkout }); return }
   doFinishWorkout()
 }
-// The workout screen's Finish pill (v1.3.11): one sheet with both ways out, Finish and save or
-// Discard. It says what finishWorkout's confirm would have said about sets still unchecked, so
-// the save needs no second question. `onDiscard` is the screen's own discard, with its confirm.
-// The editor of a saved workout still saves at once.
+// A sheet with both ways out, Finish and save or Discard. It says what finishWorkout's
+// confirm would have said about sets still unchecked, so the save needs no second question.
+// `onDiscard` is the caller's own discard, with its confirm. The editor of a saved workout
+// still saves at once. (The header Finish pill that used to open this sheet was removed on
+// 2026-10-29; finishing now goes through the buttons under the session.)
 export function finishWorkoutSheet({ onDiscard } = {}) {
   if (S().active?.editingWorkoutId) { saveWorkoutEdits(); return }
   const A = S().active

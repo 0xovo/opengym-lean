@@ -373,6 +373,8 @@ h4.sec{
 .btn:active{transform:scale(.975)}
 .btn.primary{background:var(--acc);color:var(--on-acc)}
 .btn.primary:active{background:var(--acc-2)}
+.btn.outline-green{background:transparent;border:1.5px solid var(--acc);color:var(--acc);width:auto;padding-inline:28px}
+.btn.outline-green:active{background:var(--acc-soft)}
 .btn.tinted{background:var(--acc-soft);color:var(--acc)}
 .btn.danger{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red)}
 .btn.ghost,.btn.plain{background:none;color:var(--acc);font-weight:400}
@@ -655,6 +657,12 @@ body.chips-dragging *{cursor:inherit}
   background:var(--surface);border-radius:var(--r);padding:13px 15px;
   line-height:1.45;white-space:pre-wrap;font-size:15px;margin-bottom:10px;color:var(--label-2);
 }
+.session-note{
+  display:block;width:100%;text-align:start;cursor:pointer;
+  background:none;border:none;padding:6px 2px;margin-bottom:10px;
+  font-size:15px;line-height:1.45;white-space:pre-wrap;color:var(--label);
+}
+.session-note:active{opacity:.6}
 
 /* --- search field --- */
 .searchf{position:relative;display:flex;align-items:center}
@@ -871,7 +879,6 @@ body.chips-dragging *{cursor:inherit}
 /* The clock and set count may take a second line: in ru/uk the count is the long half and a
    one-line ellipsis cut exactly the 0/19 the line is there for. */
 .whdr-mid .sub{font-size:13px;margin-top:1px;font-variant-numeric:tabular-nums;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;overflow-wrap:anywhere;text-wrap:balance}
-.btn.pill.whdr-finish{width:auto;flex:none;padding:8px 16px;border-radius:99px;font-size:15px;max-width:40%}
 /* Animations set to Small: the picture beside the exercise name, with an expand badge. */
 .wthumb{position:relative;flex:none;width:48px;height:48px;border-radius:10px;overflow:hidden;padding:0}
 .wthumb .thumb{width:48px;height:48px;border-radius:10px}

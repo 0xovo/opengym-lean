@@ -188,8 +188,9 @@ async function toggleSet(index) {
 }
 
 async function pressNext() {
-  const button = [...container.querySelectorAll('button')]
-    .find(button => button.textContent.trim() === 'Next')
+  // Next is the header's chevron since 2026-10-29 (it was a labelled button under the card
+  // before), so it is found by its aria-label rather than its text.
+  const button = container.querySelector('button[aria-label="Next"]')
   expect(button).toBeTruthy()
   await act(async () => { button.dispatchEvent(new dom.Event('click', { bubbles: true })) })
 }
@@ -2038,7 +2039,7 @@ describe('workout list view', () => {
     expect(units()[0].textContent).toContain('Current')
     expect(focusButton(units()[1])).toBeTruthy()
     const navButtons = [...container.querySelectorAll('button')]
-      .filter(b => b.textContent.trim() === 'Prev' || b.textContent.trim() === 'Next')
+      .filter(b => ['Prev', 'Next', 'Previous'].includes(b.textContent.trim()) || ['Previous', 'Next'].includes(b.getAttribute('aria-label')))
     expect(navButtons.length).toBe(0)
   })
 
@@ -3333,35 +3334,42 @@ describe('Update routine, from the More menu of an exercise', () => {
   })
 })
 
-describe('the workout screen chrome (v1.3.11)', () => {
+describe('the workout screen chrome', () => {
   const lastMenu = () => mocks.menuSheet.mock.calls.at(-1)[0]
   const item = label => menuItemsOf(lastMenu()).find(it => it.label === label)
   const click = async el => { await act(async () => { el.dispatchEvent(new dom.Event('click', { bubbles: true })) }) }
   const openMore = () => click(container.querySelector('button[aria-label="More"]'))
 
-  it('has a labelled Finish pill and a ⌄ that leaves the screen with the session still running', async () => {
-    await mount([exercise('plain-bench', [false])])
-    const pill = container.querySelector('.whdr-finish')
-    expect(pill.textContent).toBe('Finish')
+  // Until 2026-10-29 the header carried a Finish pill that opened the Finish sheet; feras
+  // had it removed. Finishing now lives under the session, the header's right side carries
+  // the cards-mode Prev/Next chevrons, and Discard stays in the ⋯ menu (covered by the
+  // requestDiscard tests above).
+  it('has no Finish pill, Prev/Next chevrons in the header instead, and a ⌄ that leaves the screen with the session still running', async () => {
+    await mount([exercise('plain-bench', [false]), exercise('plain-row', [false])])
+    expect(container.querySelector('.whdr-finish')).toBeNull()
     expect(container.querySelector('button[aria-label="Discard"]')).toBeNull()
-    // the pill opens the Finish sheet, whose Discard is the screen's own (with its confirm)
     finishWorkoutSheet.mockClear()
-    await click(pill)
-    expect(finishWorkoutSheet).toHaveBeenCalledOnce()
-    finishWorkoutSheet.mock.calls[0][0].onDiscard()
-    expect(mocks.confirmSheet.mock.calls.at(-1)[0].title).toBe('Discard workout?')
+    const prev = container.querySelector('button[aria-label="Previous"]')
+    const next = container.querySelector('button[aria-label="Next"]')
+    expect(prev).toBeTruthy()
+    expect(next).toBeTruthy()
+    expect(prev.disabled).toBe(true)          // first unit
+    expect(next.disabled).toBe(false)
+    await click(next)
+    expect(mocks.S.active.cur).toBe(1)
+    expect(finishWorkoutSheet).not.toHaveBeenCalled()
     await click(container.querySelector('button[aria-label="Minimize"]'))
     expect(mocks.nav).toHaveBeenCalledWith('/home')
     expect(mocks.S.active).not.toBeNull()
   })
 
-  it('says Save in the editor of a saved workout, and keeps its close button', async () => {
+  it('saves from the button under the session in the editor of a saved workout, and keeps its close button', async () => {
     await mount([exercise('plain-bench', [true])], 0, { active: { editingWorkoutId: 'saved' } })
-    const pill = container.querySelector('.whdr-finish')
-    expect(pill.textContent).toBe('Save')
-    expect(pill.getAttribute('aria-label')).toBe('Save changes')
+    expect(container.querySelector('.whdr-finish')).toBeNull()
+    const save = [...container.querySelectorAll('button')].find(b => b.textContent.trim() === 'Save changes')
+    expect(save).toBeTruthy()
     finishWorkoutSheet.mockClear(); finishWorkout.mockClear()
-    await click(pill)
+    await click(save)
     expect(finishWorkout).toHaveBeenCalledOnce()           // the editor saves at once
     expect(finishWorkoutSheet).not.toHaveBeenCalled()
     expect(container.querySelector('button[aria-label="Close editor"]')).toBeTruthy()

@@ -83,8 +83,9 @@ describe('finishing while a timed hold runs', () => {
   })
 })
 
-// The header's Finish pill (v1.3.11): a sheet with Finish and save and Discard workout, the
-// unchecked-sets warning as its subtitle, and no second question after Finish and save.
+// The Finish sheet itself: Finish and save and Discard workout, the unchecked-sets warning
+// as its subtitle, and no second question after Finish and save. (Its old entry point, the
+// header's Finish pill, was removed on 2026-10-29; the sheet is exercised directly here.)
 describe('the Finish sheet', () => {
   const sheetText = () => {
     const sheet = useUI.getState().sheets.at(-1)

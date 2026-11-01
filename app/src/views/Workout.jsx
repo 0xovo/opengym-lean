@@ -26,7 +26,7 @@ import WorkoutThumb, { hasWorkoutMedia } from '../components/WorkoutThumb.jsx'
 import { workoutSettingsSheet } from '../components/WorkoutSettingsSheet.jsx'
 import { durationSheet } from '../components/DurationWheel.jsx'
 import { REST_MAX, fmtRest } from '../lib/duration.js'
-import { startFlow, exercisePicker, exConfigSheet, exerciseDetailSheet, finishWorkout, exitWorkoutEdit, workoutCompleteSheet, confirmSheet, exerciseNoteSheet, sessionNoteSheet, renameWorkoutSheet, swapActiveWorkoutExercise, barWeightSheet, menuSheet, effortPickerSheet, exerciseHistorySheet, addRoutineToSessionSheet, finishWorkoutSheet } from '../sheets.jsx'
+import { startFlow, exercisePicker, exConfigSheet, exerciseDetailSheet, finishWorkout, exitWorkoutEdit, workoutCompleteSheet, confirmSheet, exerciseNoteSheet, sessionNoteSheet, renameWorkoutSheet, swapActiveWorkoutExercise, barWeightSheet, menuSheet, effortPickerSheet, exerciseHistorySheet, addRoutineToSessionSheet } from '../sheets.jsx'
 import { afterScrollRestore, scrollRestorePending } from '../components/Modals.jsx'
 import { effortColor } from '../lib/effort.js'
 import Elapsed from '../components/Elapsed.jsx'
@@ -1902,6 +1902,9 @@ function ActiveWorkout() {
     }
   }, [])
 
+  const exDone = A.entries.filter(e => e.sets.length && e.sets.every(s => s.done)).length
+  const allDone = A.entries.length > 0 && exDone === A.entries.length
+
   return <WorkoutScrollAnchor enabled={collapseOn} collapsed={[...collapsed].join(',')}>
     {/* In list mode the whole session scrolls under the header, so the header (name, clock,
         set counter, discard/finish, progress) stays pinned — the one thing you want in view
@@ -1909,16 +1912,17 @@ function ActiveWorkout() {
     <div className={'whdr' + (listMode ? ' stick' : '')} ref={hdrRef}>
     {/* ⌄ leaves the screen and keeps the session running (the tab bar's Resume brings it back);
         in the editor of a saved workout it is the ✕ that closes the editor. Discard is in the ⋯
-        menu now, and Finish is a labelled pill rather than a check that looked like a set tick: it
-        opens the Finish sheet (Finish and save, Discard), the editor's Save saves at once. */}
+        menu. There is no Finish up here (feras, 2026-10-29): finishing is the button under the
+        session (cards: the outline one; list: the bottom one), and in cards mode the header's
+        right side carries the Prev/Next chevrons where the pill used to sit. */}
     <div className="hdr whdr-bar">
       {editing
         ? <button className="iconbtn" aria-label={t('Close editor')} title={t('Close editor')} onClick={() => exitWorkoutEdit()}><Icon name="xmark" /></button>
         : <button className="iconbtn" aria-label={t('Minimize')} title={t('Minimize')} onClick={() => nav('/home')}><Icon name="chevronDown" /></button>}
       <div className="whdr-mid"><div className="whdr-name">{A.name}</div><div className="sub">{(A.backfill || editing) ? fmtDate(A.d, true) : <Elapsed start={A.start} />} · {t('{0} sets', done + '/' + total)}</div></div>
       <button className="iconbtn" aria-label={t('Workout options')} title={t('Workout options')} onClick={openViewMenu}><Icon name="more" /></button>
-      <button className="btn primary pill whdr-finish" aria-label={editing ? t('Save changes') : undefined}
-        onClick={() => (editing ? finishWorkout() : finishWorkoutSheet({ onDiscard: discardWorkout }))}>{editing ? t('Save') : t('Finish')}</button>
+      {!listMode && <button className="iconbtn" aria-label={t('Previous')} title={t('Previous')} disabled={unitIdx <= 0} onClick={() => navigateUnit(-1)}><Icon name="chevronLeft" /></button>}
+      {!listMode && <button className="iconbtn" aria-label={t('Next')} title={t('Next')} disabled={unitIdx < 0 || unitIdx >= units.length - 1} onClick={() => navigateUnit(1)}><Icon name="chevronRight" /></button>}
     </div>
     <div className="wprog"><i style={{ width: (total ? done / total * 100 : 0) + '%' }} /></div>
     {/* In the list the chips ride in the pinned header, so any exercise is one tap away from
@@ -2039,11 +2043,15 @@ function ActiveWorkout() {
     </>) : <div className="empty"><div className="ico"><Icon name="shuffle" /></div>{t('Freestyle workout. Add your first exercise and off you go.')}</div>}
 
     <div style={{ height: 12 }} />
-    {!listMode && <div className="row">
-      <Button icon="chevronLeft" disabled={unitIdx <= 0} onClick={() => navigateUnit(-1)}>{t('Prev')}</Button>
-      <Button trailingIcon="chevronRight" disabled={unitIdx < 0 || unitIdx >= units.length - 1} onClick={() => navigateUnit(1)}>{t('Next')}</Button>
-    </div>}
-    {!listMode && <div style={{ height: 10 }} />}
+    {!listMode && <>
+      <div style={{ height: 10 }} />
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <button className="btn outline-green" onClick={finishWorkout}>
+          {editing ? t('Save changes') : t('Finish workout')}
+        </button>
+      </div>
+      <div style={{ height: 10 }} />
+    </>}
     {wc.exerciseButtons && listMode && A.entries.length > 0 && <div className="muted small" style={{ marginBottom: 6 }}>{t('Move, swap and remove below act on the exercise marked {0}.', t('Current'))}</div>}
     <Button onClick={addExercise} icon="plus">{t('Add exercise')}</Button>
     {wc.exerciseButtons && A.entries.length > 0 && <>
@@ -2065,20 +2073,20 @@ function ActiveWorkout() {
       </div>
     </>}
     <div style={{ height: 10 }} />
-    {/* Wrapping up is when you know how the session went, so the note sits with the finish
-        button rather than somewhere in the header. */}
-    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
-      <Button size="sm" icon="note" variant={A.note ? 'tinted' : undefined} onClick={sessionNoteSheet}>
-        {A.note ? t('Edit session note') : t('Add session note')}
-      </Button>
-    </div>
-    {(() => {
-      const exDone = A.entries.filter(e => e.sets.length && e.sets.every(s => s.done)).length
-      const allDone = A.entries.length > 0 && exDone === A.entries.length
-      return <button className={allDone ? 'btn primary' : 'btn ghost dim'} onClick={finishWorkout}>
-        {editing ? t('Save changes') : allDone ? t('Finish workout') : t('Finish workout early · {0} exercises', exDone + '/' + A.entries.length)}
-      </button>
-    })()}
+    {/* Wrapping up is when you know how the session went, so the note sits at the end of
+        the session controls rather than somewhere in the header. A note already written
+        shows itself here as plain text on the page background, full strength, no card
+        and no label; tapping the text reopens the editor. */}
+    {A.note ? (
+      <button type="button" className="session-note" aria-label={t('Edit session note')} onClick={sessionNoteSheet}>{A.note}</button>
+    ) : (
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+        <Button size="sm" icon="note" onClick={sessionNoteSheet}>{t('Add session note')}</Button>
+      </div>
+    )}
+    {listMode && <button className={allDone ? 'btn primary' : 'btn ghost dim'} onClick={finishWorkout}>
+      {editing ? t('Save changes') : t('Finish workout')}
+    </button>}
     <div className="workout-end-spacer" />
   </WorkoutScrollAnchor>
 }
