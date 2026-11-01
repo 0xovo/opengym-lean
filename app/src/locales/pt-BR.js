@@ -327,6 +327,7 @@ export const PT_BR_OVERRIDES = {
   'Superset with exercise above': 'Superset com o exercício acima',
   'Guest mode: your data lives only in this browser.': 'Modo visitante: seus dados ficam só neste navegador.',
   'Sign in with passkey': 'Entrar com chave de acesso',
+  'Continue with Google': 'Continuar com o Google',
   // --- password sign-in (#118) ---
   'Sign in with password': 'Entrar com senha',
   'Password': 'Senha',

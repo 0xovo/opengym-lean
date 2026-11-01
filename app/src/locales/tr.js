@@ -296,6 +296,7 @@ export default {
   'Create passkey': 'Geçiş anahtarı oluştur',
   'Your workouts. Your weights. Your profile.': 'Senin antrenmanların. Senin ağırlıkların. Senin profilin.',
   'Sign in with passkey': 'Geçiş anahtarıyla giriş yap',
+  'Continue with Google': 'Google ile devam et',
   'Create new profile': 'Yeni profil oluştur',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': 'Bu tarayıcı geçiş anahtarlarıyla anlaşamıyor ama openGym’i bu cihazda yerel olarak yine de kullanabilirsin.',
   "This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.": 'Bu tarayıcı geçiş anahtarlarını desteklemiyor ve bu sunucu bir hesap gerektiriyor. Geçiş anahtarı destekleyen bir tarayıcı veya cihaz dene.',

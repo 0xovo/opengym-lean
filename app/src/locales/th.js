@@ -301,6 +301,7 @@ export default {
   'Create passkey': 'สร้างพาสคีย์',
   'Your workouts. Your weights. Your profile.': 'การออกกำลังกายของคุณ น้ำหนักของคุณ โปรไฟล์ของคุณ',
   'Sign in with passkey': 'เข้าสู่ระบบด้วยพาสคีย์',
+  'Continue with Google': 'ดำเนินการต่อด้วย Google',
   'Create new profile': 'สร้างโปรไฟล์ใหม่',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': 'เบราว์เซอร์นี้ไม่รองรับพาสคีย์ แต่ยังใช้ openGym บนเครื่องนี้ได้ตามปกติ',
   "This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.": 'เบราว์เซอร์นี้ไม่รองรับพาสคีย์ และเซิร์ฟเวอร์นี้ต้องมีบัญชีผู้ใช้ ลองใช้เบราว์เซอร์หรืออุปกรณ์ที่รองรับพาสคีย์',

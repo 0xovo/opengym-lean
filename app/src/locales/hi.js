@@ -296,6 +296,7 @@ export default {
   'Create passkey': 'पासकी बनाएँ',
   'Your workouts. Your weights. Your profile.': 'आपके वर्कआउट। आपके वज़न। आपकी प्रोफ़ाइल।',
   'Sign in with passkey': 'पासकी से साइन इन करें',
+  'Continue with Google': 'Google से जारी रखें',
   'Create new profile': 'नई प्रोफ़ाइल बनाएँ',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': 'यह ब्राउज़र पासकी नहीं चलाता, पर आप इस डिवाइस पर openGym लोकली इस्तेमाल कर सकते हैं।',
   "This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.": 'यह ब्राउज़र पासकी सपोर्ट नहीं करता, और इस सर्वर के लिए खाता ज़रूरी है। पासकी सपोर्ट वाला ब्राउज़र या डिवाइस आज़माएँ।',

@@ -296,6 +296,7 @@ export default {
   'Create passkey': 'Crea passkey',
   'Your workouts. Your weights. Your profile.': 'I tuoi allenamenti. I tuoi pesi. Il tuo profilo.',
   'Sign in with passkey': 'Accedi con passkey',
+  'Continue with Google': 'Continua con Google',
   'Create new profile': 'Crea nuovo profilo',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': 'Questo browser non gestisce le passkey, ma puoi comunque usare openGym localmente su questo dispositivo.',
   "This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.": 'Questo browser non supporta le passkey e questo server richiede un account. Prova un browser o un dispositivo che supporti le passkey.',

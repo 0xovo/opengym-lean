@@ -292,6 +292,7 @@ export default {
   'Create passkey': '建立通行密鑰',
   'Your workouts. Your weights. Your profile.': '掌控你的訓練、重量與個人檔案。',
   'Sign in with passkey': '使用通行密鑰登入',
+  'Continue with Google': '使用 Google 繼續',
   'Create new profile': '建立新個人檔案',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': '這個瀏覽器不支援通行密鑰，不過你仍然可以在本裝置上離線單機使用 openGym。',
   "This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.": '此瀏覽器不支援通行密鑰，且本伺服器需要帳號。請改用支援通行密鑰的瀏覽器或裝置。',

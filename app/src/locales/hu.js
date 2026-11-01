@@ -301,6 +301,7 @@ export default {
   'Create passkey': 'Jelszókulcs létrehozása',
   'Your workouts. Your weights. Your profile.': 'A te edzéseid. A te súlyaid. A te profilod.',
   'Sign in with passkey': 'Bejelentkezés jelszókulccsal',
+  'Continue with Google': 'Folytatás Google-fiókkal',
   'Create new profile': 'Új profil létrehozása',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': 'Ez a böngésző nem tud jelszókulcsokat, de az openGym-et így is használhatod helyben, ezen az eszközön.',
   'This browser doesn\'t support passkeys, and this instance requires an account. Try a browser or device with passkey support.': 'Ez a böngésző nem támogatja a jelszókulcsokat, ez a szerver pedig fiókot igényel. Próbálj egy jelszókulcsot támogató böngészőt vagy eszközt.',

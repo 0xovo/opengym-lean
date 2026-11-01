@@ -276,6 +276,7 @@ export default {
   'Create passkey': 'إنشاء مفتاح مرور',
   'Your workouts. Your weights. Your profile.': 'تمارينك. أوزانك. ملفك الشخصي.',
   'Sign in with passkey': 'تسجيل الدخول بمفتاح المرور',
+  'Continue with Google': 'المتابعة باستخدام Google',
   'Create new profile': 'إنشاء ملف شخصي جديد',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': 'هذا المتصفح لا يتعامل مع مفاتيح المرور، لكن لا يزال بإمكانك استخدام openGym محليًا على هذا الجهاز.',
   'This browser doesn\'t support passkeys, and this instance requires an account. Try a browser or device with passkey support.': 'هذا المتصفح لا يدعم مفاتيح المرور، وهذه النسخة تتطلب حساباً. جرّب متصفحاً أو جهازاً يدعم مفاتيح المرور.',

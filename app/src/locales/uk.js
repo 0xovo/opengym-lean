@@ -262,6 +262,7 @@ export default {
   'Create passkey': 'Створити ключ доступу',
   'Your workouts. Your weights. Your profile.': 'Твої тренування. Твоя вага. Твій профіль.',
   'Sign in with passkey': 'Увійти за ключем доступу',
+  'Continue with Google': 'Продовжити через Google',
   'Create new profile': 'Створити новий профіль',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': 'Цей браузер не вміє в ключі доступу, але openGym можна використовувати локально на цьому пристрої.',
   "This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.": 'Цей браузер не підтримує ключі доступу, а цей сервер вимагає акаунт. Спробуй браузер або пристрій із підтримкою ключів доступу.',

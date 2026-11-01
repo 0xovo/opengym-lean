@@ -296,6 +296,7 @@ export default {
   'Create passkey': '패스키 만들기',
   'Your workouts. Your weights. Your profile.': '당신의 운동. 당신의 무게. 당신의 프로필.',
   'Sign in with passkey': '패스키로 로그인',
+  'Continue with Google': 'Google로 계속하기',
   'Create new profile': '새 프로필 만들기',
   'This browser doesn\'t do passkeys, but you can still use openGym locally on this device.': '이 브라우저는 패스키를 지원하지 않지만, 이 기기에서 openGym을 로컬로 계속 쓸 수 있어요.',
   "This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.": '이 브라우저는 패스키를 지원하지 않고, 이 서버는 계정이 필요합니다. 패스키를 지원하는 브라우저나 기기를 사용해 보세요.',
