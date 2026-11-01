@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="240" viewBox="0 0 720 240" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+  </defs>
+
+  <text x="223" y="40" font-size="12" fill="#57606a" text-anchor="middle">optional sign-in</text>
+  <text x="223" y="55" font-size="12" fill="#57606a" text-anchor="middle">and sync</text>
+
+  <rect x="15" y="66" width="180" height="84" rx="8" fill="#ffffff" stroke="#2ea44f" stroke-width="1.5"/>
+  <text x="105" y="94" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Your phone or laptop</text>
+  <text x="105" y="116" font-size="13" fill="#1f2328" text-anchor="middle">the app in the browser,</text>
+  <text x="105" y="134" font-size="13" fill="#1f2328" text-anchor="middle">data in local storage</text>
+
+  <rect x="252" y="66" width="185" height="84" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="345" y="94" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Vercel</text>
+  <text x="345" y="116" font-size="13" fill="#1f2328" text-anchor="middle">the sync-server, passkeys</text>
+  <text x="345" y="134" font-size="13" fill="#1f2328" text-anchor="middle">and push booking</text>
+
+  <rect x="494" y="66" width="211" height="84" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="600" y="94" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Your Firebase project</text>
+  <text x="600" y="116" font-size="13" fill="#1f2328" text-anchor="middle">sign-in and Firestore,</text>
+  <text x="600" y="134" font-size="13" fill="#1f2328" text-anchor="middle">one private tree per user</text>
+
+  <line x1="197" y1="108" x2="248" y2="108" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="439" y1="108" x2="490" y2="108" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="15" y="178" width="150" height="42" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="90" y="204" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">QStash (optional)</text>
+  <line x1="90" y1="176" x2="90" y2="154" stroke="#57606a" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="182" y="203" font-size="12" fill="#57606a">rest alerts to a locked phone</text>
+</svg>

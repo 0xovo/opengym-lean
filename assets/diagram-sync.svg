@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="200" viewBox="0 0 720 200" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+  </defs>
+
+  <rect x="40" y="28" width="130" height="46" rx="8" fill="#ffffff" stroke="#2ea44f" stroke-width="1.5"/>
+  <text x="105" y="57" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Phone</text>
+
+  <rect x="40" y="118" width="130" height="46" rx="8" fill="#ffffff" stroke="#2ea44f" stroke-width="1.5"/>
+  <text x="105" y="147" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Laptop</text>
+
+  <rect x="300" y="55" width="250" height="82" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="425" y="88" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Your Firestore tree</text>
+  <text x="425" y="110" font-size="13" fill="#1f2328" text-anchor="middle">every record carries</text>
+  <text x="425" y="127" font-size="13" fill="#1f2328" text-anchor="middle">its own stamp</text>
+
+  <line x1="174" y1="56" x2="294" y2="84" stroke="#57606a" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <line x1="174" y1="136" x2="294" y2="108" stroke="#57606a" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+
+  <text x="425" y="166" font-size="12" fill="#57606a" text-anchor="middle">newest edit of each record wins,</text>
+  <text x="425" y="182" font-size="12" fill="#57606a" text-anchor="middle">deletions stay deleted</text>
+</svg>
