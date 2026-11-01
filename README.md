@@ -4,6 +4,14 @@ A leaner fork of [openGym](https://github.com/DuarteSantos8/openGym). Same worko
 
 **Live: [opengym-lean.vercel.app](https://opengym-lean.vercel.app)**
 
+<table align="center">
+<tr>
+<td align="center"><img src="assets/screenshots/home.png" alt="Home screen" width="230"><br><sub><b>Home</b> · today and the week at a glance</sub></td>
+<td align="center"><img src="assets/screenshots/workout.png" alt="Workout screen" width="230"><br><sub><b>Guided workout</b> · sets, reps and progression</sub></td>
+<td align="center"><img src="assets/screenshots/stats.png" alt="Stats screen" width="230"><br><sub><b>Stats</b> · activity heatmap and muscle balance</sub></td>
+</tr>
+</table>
+
 This is my own project built on top of openGym. It is not part of the upstream app and it is not the official version. I liked openGym, so I stripped it down to the parts I actually use and made it plug and play: open it and train. No server, no account, no setup. If you want your data synced across devices, you can link your own Firebase project with a short guided setup.
 
 ## Use it
