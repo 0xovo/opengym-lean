@@ -3,7 +3,7 @@
 This is the setup guide for **Option 2**. Option 1 (local only) needs no setup at
 all: deploy the static app anywhere and use it, data stays in the browser.
 
-Option 2 adds **cross-device sync and passkey sign-in**, using **your own** free
+Option 2 adds **cross-device sync and sign-in (a passkey, or Google)**, using **your own** free
 Firebase project and **your own** Vercel project. There is no shared backend: your
 data lives in a Firebase project only you control, and nobody else ever sees it.
 Total cost: **$0** (Firebase Spark free plan plus Vercel free tier). No credit card,
@@ -118,7 +118,15 @@ tab, paste the contents of `firestore.rules`, Publish.
    Your plan and history arrive, and from then on all your devices stay in sync
    live.
 5. Later, to add a passkey on another device: sign in there first, then
-   Settings, Account, "Add a passkey on this device".
+   Settings, Account, **Sign-in methods**, "Add a passkey".
+
+**Google sign-in and Sign-in methods.** Instead of a passkey, you can sign in
+with Google: enable the Google provider under Authentication, Sign-in method
+in your Firebase console, and the **Continue with Google** button works with
+no other setup. Whichever way you signed in, the **Sign-in methods** card in
+Settings, Account is where you link a Google account, add or remove a
+passkey, or unlink Google; it will not let you remove your last remaining
+way in.
 
 ## Check it worked
 

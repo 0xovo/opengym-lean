@@ -7,5 +7,8 @@ created by **DuarteSantos**.
 - Mirror: https://gitea.com/DuarteSantos/openGym
 - License: GNU AGPL-3.0 (see `app/LICENSE`)
 
-Changes in this fork: the gym check-in card feature and the AI Coach UI are
-removed. No other upstream functionality is modified.
+Changes in this fork: the gym check-in card feature, the AI Coach UI, the
+admin dashboard, the first-launch onboarding screens and the workout photos
+and videos UI are removed; optional bring-your-own-Firebase sync with
+passkey and Google sign-in, a Sign-in methods card in Settings, and
+server-free rest timer alerts are added. Everything else works as upstream.
