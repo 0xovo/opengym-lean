@@ -428,7 +428,6 @@ h4.sec{
 #tabbar button.start .cir{
   width:52px;height:52px;border-radius:50%;background:var(--acc);color:var(--on-acc);
   display:flex;align-items:center;justify-content:center;position:relative;
-  box-shadow:0 6px 18px -4px color-mix(in srgb,var(--acc) 55%,transparent);
   transition:transform var(--fast) var(--ease);
 }
 #tabbar button.start:active .cir{transform:scale(.93)}
@@ -440,7 +439,7 @@ h4.sec{
    orange play glyph onto an orange disc. Both states restate their own colour.
    The disc is orange in either theme, so its glyph is black, not `--on-acc`. */
 #tabbar button.start .cir{color:var(--on-acc)}
-#tabbar button.start.rec .cir{background:var(--orange);color:#000;box-shadow:0 6px 18px -4px color-mix(in srgb,var(--orange) 55%,transparent)}
+#tabbar button.start.rec .cir{background:var(--orange);color:#000}
 #tabbar button.start.rec span{color:var(--orange)}
 #tabbar button.start.rec .cir::after{
   content:'';position:absolute;inset:0;border-radius:50%;
