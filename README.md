@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="app/public/icon-512.png" alt="openGym logo" width="160">
+
 # opengym-lean
 
 A leaner fork of [openGym](https://github.com/DuarteSantos8/openGym). Same workout tracker, less of everything else.
