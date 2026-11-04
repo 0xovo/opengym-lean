@@ -188,6 +188,50 @@ Setup, once Parts 1 to 4 are working:
    Each device subscribes itself the same way, and a rest alerts the device
    that started it.
 
+## Optional: connect your own agent (MCP)
+
+The sync deploy also ships an agent connector: a remote MCP endpoint that
+lets your own AI agent work with your training data. It is part of the same
+one-click deploy above, inside the same Vercel project and the same
+functions, so there is nothing extra to install or deploy. It only exists
+in sync mode, because in local-only mode your data stays in the browser
+and no outside agent can reach it.
+
+The connector is off in practice until you turn it on yourself: it does
+nothing until the owner mints a token in the app. The server-side kill
+switch is the environment variable AGENT_CONNECTOR_ENABLED. Leave it
+unset, or set it to on, and the connector is enabled but inert: no token,
+no access. Set it to an off value (false, 0, off, no or disabled) and the
+endpoint and token creation are disabled. To do that, change
+AGENT_CONNECTOR_ENABLED in the Vercel project settings. The change
+takes effect on the next redeploy, and that redeploy is what disables
+the endpoint and token creation. The normal way to turn the
+connector off for one agent is simpler: revoke its token in Settings.
+
+To connect a client:
+
+1. Open the deployed app, sign in, and go to Settings, Account, Agent
+   connections.
+2. Create a token and pick its scopes. Read, write and delete are separate
+   grants: a read-only token can look at your routines, workouts and
+   weigh-ins but cannot change anything, and delete is never implied by
+   write. The raw token is shown once, at creation; only its hash is
+   stored on the server.
+3. The card shows the MCP address for your deployment (your app address
+   plus /api/mcp) and a ready client config snippet. Paste that config,
+   with the token, into your agent client (Claude, Codex, or any client
+   that speaks MCP over HTTP).
+4. Every write and delete the agent makes is stamped as coming from an
+   agent and written to an audit log in your own Firestore tree, with the
+   token name attached. Revoke a token in the same card at any time and
+   that agent loses access right away.
+
+Push notifications follow the same pattern as the rest of this deploy:
+they already work as a switch through the QStash keys. Set the QStash and
+VAPID keys in the environment and locked-phone rest alerts are on; leave
+them unset and that feature is off, with the local rest alert as the
+whole story. There is no separate toggle to build or find.
+
 ## One honest warning about the trust model
 
 There are no passwords and no invite codes in this setup. The rule is: **whoever

@@ -48,7 +48,7 @@ Same app underneath. The differences are what got taken out and how sync works.
 
 **Or sync it.** Follow [SETUP-SYNC.md](SETUP-SYNC.md) to connect your own free Firebase project and deploy the small sync backend to Vercel. Sign in with a passkey or with Google, and your plans and history follow you between phone and laptop. Your data lives in your Firebase project, under your account, not on anyone else's server.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F0xovo%2Fopengym-lean&project-name=opengym-lean&repository-name=opengym-lean&root-directory=sync-server&env=FIREBASE_SERVICE_ACCOUNT%2CWEBAUTHN_RP_ID%2CWEBAUTHN_ORIGIN%2CVITE_FB_API_KEY%2CVITE_FB_PROJECT_ID%2CVITE_FB_APP_ID&envDescription=All+values+come+from+your+own+Firebase+project+%28SETUP-SYNC.md%2C+Part+1%29.+FIREBASE_SERVICE_ACCOUNT+is+the+service+account+JSON+pasted+as+one+value.+WEBAUTHN_RP_ID+is+your+Vercel+domain+as+a+bare+host+%28your-project.vercel.app%29+and+WEBAUTHN_ORIGIN+is+the+same+domain+with+https%3A%2F%2F+in+front.+VITE_FB_API_KEY%2C+VITE_FB_PROJECT_ID+and+VITE_FB_APP_ID+come+from+the+firebaseConfig+block+of+your+web+app.&envLink=https%3A%2F%2Fgithub.com%2F0xovo%2Fopengym-lean%2Fblob%2Fmain%2FSETUP-SYNC.md)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F0xovo%2Fopengym-lean&project-name=opengym-lean&repository-name=opengym-lean&root-directory=sync-server&env=FIREBASE_SERVICE_ACCOUNT%2CWEBAUTHN_RP_ID%2CWEBAUTHN_ORIGIN%2CVITE_FB_API_KEY%2CVITE_FB_PROJECT_ID%2CVITE_FB_APP_ID%2CAGENT_CONNECTOR_ENABLED&envDescription=All+values+come+from+your+own+Firebase+project+%28SETUP-SYNC.md%2C+Part+1%29.+FIREBASE_SERVICE_ACCOUNT+is+the+service+account+JSON+pasted+as+one+value.+WEBAUTHN_RP_ID+is+your+Vercel+domain+as+a+bare+host+%28your-project.vercel.app%29+and+WEBAUTHN_ORIGIN+is+the+same+domain+with+https%3A%2F%2F+in+front.+VITE_FB_API_KEY%2C+VITE_FB_PROJECT_ID+and+VITE_FB_APP_ID+come+from+the+firebaseConfig+block+of+your+web+app.&envLink=https%3A%2F%2Fgithub.com%2F0xovo%2Fopengym-lean%2Fblob%2Fmain%2FSETUP-SYNC.md)
 
 ---
 
@@ -63,6 +63,12 @@ In sync mode your data is split into small documents inside your own tree, `user
 <p align="center"><img src="assets/diagram-sync.svg" alt="Sync diagram: phone and laptop both write into your Firestore tree, and the newest edit of each record wins" width="720"></p>
 
 Edits made offline are kept on the device and merged when it reconnects; nothing is thrown away for being offline.
+
+---
+
+## Connect your own agent
+
+Sync mode also ships an agent connector (MCP). Connect your own agent (Claude, Codex, etc.) with a token you mint in Settings, under Agent connections. The card shows the MCP address for your deployment and a ready client config snippet. You pick what each token can do: read, write and delete are separate scopes, so a token only gets the access you grant it. With those scopes an agent can read your training data, add exercises, log workouts and delete entries. Every change it makes is logged, you can revoke a token at any time, and the whole connector has a kill switch in the deployment environment: AGENT_CONNECTOR_ENABLED. It does nothing until you mint the first token. Full setup notes are in [SETUP-SYNC.md](SETUP-SYNC.md).
 
 ---
 
