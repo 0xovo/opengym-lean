@@ -26,6 +26,7 @@ import { DEMO, REPO } from '../lib/demo.js'
 import { FIREBASE_MODE, firebaseEnabled } from '../lib/firebase-config.js'
 import FirebaseAccount from '../components/FirebaseAccount.jsx'
 import SignInMethods from '../components/SignInMethods.jsx'
+import AgentConnections, { AgentConnectionsNote } from '../components/AgentConnections.jsx'
 import { MOBILE, isAndroid, shareExport, shareExportBlob, syncReminder } from '../lib/mobile.js'
 import { NUDGE_COPY, NUDGE_TONES, toneOf } from '../lib/nudge.js'
 import { referencedFiles } from '../lib/media-refs.js'
@@ -766,6 +767,10 @@ export default function Settings({ page = null, find = null, via = null }) {
       {/* Firebase mode: account linking (Google + passkeys), the one place sign-in
           methods are managed. Self-hides when signed out. */}
       {FIREBASE_MODE && <SignInMethods />}
+      {/* Firebase mode: agent (MCP) tokens for the account. In a local-only
+          build there is nothing for an outside agent to reach, so the note
+          says that in one line instead of a dead card. */}
+      {FIREBASE_MODE ? <AgentConnections /> : <AgentConnectionsNote />}
       {/* The server: which one, which account, how that stands, "Sync now". A paired phone's
           Admin and Disconnect sit in the same block; a browser's account rows follow in their own. */}
       {user && !DEMO && <ServerSyncSection>

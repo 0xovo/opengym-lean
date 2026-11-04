@@ -5,6 +5,9 @@ rules_version = '2';
 // measurements subcollections. Everything else is denied, including the passkey
 // collections (passkeys, passkeyUsers, passkeyChallenges), which only the Admin SDK in
 // the /api/passkey/* Vercel functions may touch (Admin SDK bypasses these rules).
+// The agent connector changes nothing here: agentTokens (hash-keyed, top level) falls
+// under the deny-all below and stays Admin-SDK-only, and the audit trail the MCP writes
+// lives inside the owner's own tree at users/{uid}/agentLog, covered by the wildcard.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid} {

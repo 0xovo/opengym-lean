@@ -229,6 +229,17 @@ export async function fbSignInMethods() {
   return postJSON('/api/passkey/list', {}, token)
 }
 
+/** The account's agent tokens, from the project's own server (the agentTokens
+ *  collection is Admin-SDK-only, so the client cannot read it directly). One
+ *  door for the Settings Agent connections card: op is 'list', 'create' or
+ *  'revoke'; create returns the raw token exactly once. */
+export async function fbAgentTokens(op, payload = {}) {
+  await ensureFirebase()
+  const token = auth.currentUser ? await auth.currentUser.getIdToken() : null
+  if (!token) throw new Error('Sign in first')
+  return postJSON('/api/passkey/agent-tokens', { op, ...payload }, token)
+}
+
 /** Add a passkey to the signed-in account through the LINK ceremony
  *  (/api/passkey/link-*): the server binds the credential, and, for a Google-first
  *  user picking their first username, the username record, to the uid from the ID

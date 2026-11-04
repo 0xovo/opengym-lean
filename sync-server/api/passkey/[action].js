@@ -1,5 +1,6 @@
 import { admin, body, send, handler, bearerUid } from './_lib.js'
 import { listSignInMethods, linkOptions, linkVerify, removePasskey } from './_methods.js'
+import { mcpHandler, agentTokensAction } from '../_agent.js'
 
 // Single Vercel function for the four Sign-in methods endpoints:
 //   POST /api/passkey/list         → the caller's methods (Settings reads state here)
@@ -19,9 +20,13 @@ const ROUTES = {
   'link-options': async ({ uid, req, db }) => linkOptions({ uid, reqBody: await body(req), db }),
   'link-verify': async ({ uid, req, db }) => linkVerify({ uid, reqBody: await body(req), db }),
   remove: async ({ uid, req, db, auth }) => removePasskey({ uid, reqBody: await body(req), db, auth }),
+  // Agent connections (Settings card): list / create / revoke the caller's own
+  // MCP agent tokens. Same door as the methods above (uid from the verified ID
+  // token); the cores live in ../_agent.js. The body carries { op, ... }.
+  'agent-tokens': async ({ uid, req, db }) => agentTokensAction({ uid, reqBody: await body(req), db }),
 }
 
-export default handler(async (req, res) => {
+const methodsHandler = handler(async (req, res) => {
   const route = ROUTES[req.query?.action]
   if (!route) return send(res, 404, { error: 'Not found' })
   const { auth, db } = admin()
@@ -30,3 +35,13 @@ export default handler(async (req, res) => {
   const { status, payload } = await route({ uid, req, db, auth })
   return send(res, status, payload)
 })
+
+// /api/mcp arrives here through the vercel.json rewrite to /api/passkey/mcp:
+// the agent connector (../_agent.js) is gated on its own per-user agent tokens,
+// not on a Firebase ID token, so it bypasses the POST-only methods wrapper
+// above; every other action, known or not, keeps the exact behavior it had
+// (unknown actions still 404 inside).
+export default async (req, res) => {
+  if (req.query?.action === 'mcp') return mcpHandler(req, res)
+  return methodsHandler(req, res)
+}
