@@ -537,6 +537,12 @@ h4.sec{
   font-weight:500;text-transform:capitalize;
 }
 .tag.acc{background:var(--acc-soft);color:var(--acc)}
+.wordmark{display:inline-flex;align-items:center;gap:9px;white-space:nowrap}
+.lean-badge{
+  flex:none;border-radius:99px;background:var(--acc-soft);color:var(--acc);
+  font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  line-height:1;padding:4px 8px;
+}
 /* Left / Right on a per-side row: one width for both (#322). The two hidden words share the
    visible one's grid cell, so the pill is as wide as the longer word. */
 .tag.sidepill{display:inline-grid;justify-items:center;flex:none}

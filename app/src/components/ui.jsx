@@ -490,6 +490,17 @@ function require_ui() {
   return _ui.getState()
 }
 
+/* ============================ wordmark ============================ */
+
+// The app name as shown in the big headers (Home, Login): openGym plus a small
+// LEAN badge. The badge is flair only, so it is hidden from assistive tech and
+// the accessible name of the header stays the app name itself.
+export function Wordmark() {
+  return (
+    <span className="wordmark">openGym<span className="lean-badge" aria-hidden="true">Lean</span></span>
+  )
+}
+
 /* ============================ buttons ============================ */
 
 export function Button({ variant = 'plain', size, icon, trailingIcon, children, className = '', ...rest }) {
